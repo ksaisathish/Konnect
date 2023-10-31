@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/main_menu_item"
+        android:title="Main Menu">
+        <menu>
+            <item
+                android:id="@+id/chat_item"
+                android:icon="@drawable/baseline_chat_24"
+                android:title="Chat"
+                android:checkable="true"
+                app:showAsAction="ifRoom"/>
+            <item
+                android:id="@+id/find_others_item"
+                android:icon="@drawable/baseline_people_24"
+                android:title="Find Others on Network"
+                android:checkable="true"
+                app:showAsAction="ifRoom"/>
+            <item
+                android:id="@+id/view_graph_item"
+                android:icon="@drawable/baseline_auto_graph_24"
+                android:title="View Graph"
+                android:checkable="true"
+                app:showAsAction="ifRoom"/>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/dev_options_item"
+        android:title="Developer Options">
+        <menu>
+            <item
+                android:id="@+id/debug_settings"
+                android:icon="@drawable/baseline_checklist_24"
+                android:title="Debug Settings"
+                android:checkable="true"
+                app:showAsAction="ifRoom"/>
+        </menu>
+    </item>
+</menu>

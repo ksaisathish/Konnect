@@ -10,28 +10,28 @@
         android:id="@+id/appLogo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="48dp"
-        app:layout_constraintBottom_toTopOf="@+id/SplashScreenTitle"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="64dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/konnect_logo_final" />
 
     <TextView
         android:id="@+id/SplashScreenTitle"
-        style="@style/DefaultAppNameText"
+        style="@style/HeadingText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
-        android:text="@string/app_name"
+        android:text="Konnect"
+        android:textAlignment="center"
+        android:textColor="@color/konnectRed"
+        android:textSize="80sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appLogo" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

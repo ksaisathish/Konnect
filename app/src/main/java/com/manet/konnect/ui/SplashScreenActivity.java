@@ -42,14 +42,14 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Start the animation
         fadeInAnimator.start();
 
-        handler.post(checkPermissionsRunnable);
+        handler.postDelayed(checkPermissionsRunnable,3000);
     }
 
     private Runnable checkPermissionsRunnable=new Runnable(){
         @Override
         public void run() {
             checkPermissionsAndMoveToNextActivity();
-            handler.postDelayed(this,3000);
+            handler.postDelayed(this,5000);
         }
     };
 
@@ -71,12 +71,23 @@ public class SplashScreenActivity extends AppCompatActivity {
         pm.checkPermissionsAndFeatures();
 
         if(pm.getAllPermissionsGiven()){
-            Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+            Intent intent;
+            Boolean isLoggedIn;
+
+            //Logic for Checking if User is Logged In Already.
+            isLoggedIn=false;
+
+            if(isLoggedIn){
+                intent= new Intent(SplashScreenActivity.this, MainActivity.class);
+            }
+            else{
+                intent= new Intent(SplashScreenActivity.this, GetStartedActivity.class);
+            }
+
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
         }
-        //
     }
 
     @Override

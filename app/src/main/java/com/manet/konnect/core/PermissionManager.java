@@ -11,6 +11,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -81,14 +82,15 @@ public class PermissionManager extends AppCompatActivity {
         activity.startActivity(intent);
     }
 
-
     public void checkPermissionsAndFeatures() {
+        allPermissionsGiven=false;
         for (Map.Entry<String, Integer> entry : permissionRequestCodes.entrySet()) {
             String permission = entry.getKey();
             int requestCode = entry.getValue();
             Log.i(TAG,"Checking Settings for"+permission);
             if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                 // Permission not granted, request it
+                showToast("Need "+permission+"Permission for Communication.", Toast.LENGTH_SHORT);
                 ActivityCompat.requestPermissions(activity, new String[]{permission}, requestCode);
                 return; // Wait for onRequestPermissionsResult
             }
@@ -101,19 +103,18 @@ public class PermissionManager extends AppCompatActivity {
     private void checkAndEnableFeatures() {
         // Check if Wi-Fi is enabled
         if (!isWiFiEnabled()) {
+            showToast("Need to enable WiFi for Communication.", Toast.LENGTH_SHORT);
             redirectToSettings(Settings.Panel.ACTION_WIFI);
             return;
         }
 
         // Check if Bluetooth is enabled
         if (!isBluetoothEnabled()) {
+            showToast("Need to enable Bluetooth for Communication.", Toast.LENGTH_SHORT);
             redirectToSettings(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             return;
         }
-
         allPermissionsGiven=true;
-        //Move to the next activity
-        //moveToNextActivity();
     }
 
     public boolean getAllPermissionsGiven(){
@@ -135,6 +136,11 @@ public class PermissionManager extends AppCompatActivity {
             redirectToSettings(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             checkPermissionsAndFeatures();
         }
+    }
+
+    private void showToast(String message, int duration) {
+        Toast toast = Toast.makeText(context, message, duration);
+        toast.show();
     }
 
 }
