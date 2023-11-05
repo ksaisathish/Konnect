@@ -90,7 +90,7 @@ public class PermissionManager extends AppCompatActivity {
             Log.i(TAG,"Checking Settings for"+permission);
             if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                 // Permission not granted, request it
-                showToast("Need "+permission+"Permission for Communication.", Toast.LENGTH_SHORT);
+                showToast("Need "+permission+" Permission for Communication.", Toast.LENGTH_SHORT);
                 ActivityCompat.requestPermissions(activity, new String[]{permission}, requestCode);
                 return; // Wait for onRequestPermissionsResult
             }
