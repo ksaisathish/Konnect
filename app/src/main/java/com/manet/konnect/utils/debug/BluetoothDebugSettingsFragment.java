@@ -1,5 +1,6 @@
 package com.manet.konnect.utils.debug;
 
+import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,8 +14,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.manet.konnect.R;
-import com.manet.konnect.core.ConnectionManager;
-import com.manet.konnect.utils.DevicesListAdapter;
+import com.manet.konnect.core.BLTConnectionManager;
+import com.manet.konnect.utils.BLTDevicesListAdapter;
 import com.manet.konnect.utils.OnBluetoothDeviceDiscoveredListener;
 
 import java.util.ArrayList;
@@ -31,9 +32,10 @@ public class BluetoothDebugSettingsFragment extends Fragment implements OnBlueto
     Button makeBluetoothDeviceDiscoverable;
     Button discoverBluetoothDevices;
 
-    Map<String, String> bluetoothPeerDevicesMap;
-    DevicesListAdapter peerDevicesAdapter;
+    Map<String, BluetoothDevice> bluetoothPeerDevicesMap;
+    BLTDevicesListAdapter peerDevicesAdapter;
     ListView peerDevicesListView;
+    BLTConnectionManager connMngr;
 
     private String TAG="BluetoothDebugSettingsFragment";
     public BluetoothDebugSettingsFragment() {
@@ -50,6 +52,8 @@ public class BluetoothDebugSettingsFragment extends Fragment implements OnBlueto
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG,"hERE");
+        connMngr=new BLTConnectionManager(this.getContext(),this.getActivity());
 
     }
 
@@ -58,14 +62,14 @@ public class BluetoothDebugSettingsFragment extends Fragment implements OnBlueto
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView=inflater.inflate(R.layout.fragment_bluetooth_debug_settings, container, false);
-        ConnectionManager connMngr=new ConnectionManager(this.getContext(),this.getActivity());
+
         deviceName=rootView.findViewById(R.id.bluetoothDeviceNameText);
         deviceName.append(connMngr.getBluetoothDeviceName());
 
         ListView pairedDevicesListView = rootView.findViewById(R.id.bluetoothPairedDevicesList);
-        Map<String, String> bluetoothPairedDevicesMap=connMngr.getBluetoothPairedDevicesMap();
+        Map<String, BluetoothDevice> bluetoothPairedDevicesMap=connMngr.getBluetoothPairedDevicesMap();
         List<String> bluetoothPairedDevicesList = new ArrayList<>(bluetoothPairedDevicesMap.keySet());
-        DevicesListAdapter pairedDevicesAdapter =new DevicesListAdapter(requireContext(),bluetoothPairedDevicesMap);
+        BLTDevicesListAdapter pairedDevicesAdapter =new BLTDevicesListAdapter(requireContext(),getActivity(),bluetoothPairedDevicesMap);
         pairedDevicesListView.setAdapter(pairedDevicesAdapter);
 
         makeBluetoothDeviceDiscoverable=rootView.findViewById(R.id.makeBluetoothDeviceDiscoverable);
@@ -79,13 +83,13 @@ public class BluetoothDebugSettingsFragment extends Fragment implements OnBlueto
 
         peerDevicesListView = rootView.findViewById(R.id.bluetoothPeerDevicesList);
         bluetoothPeerDevicesMap=connMngr.getBluetoothPeerDevicesMap();
-        peerDevicesAdapter =new DevicesListAdapter(requireContext(),bluetoothPeerDevicesMap);
+        peerDevicesAdapter =new BLTDevicesListAdapter(requireContext(),getActivity(),bluetoothPeerDevicesMap);
         peerDevicesListView.setAdapter(peerDevicesAdapter);
 
         discoverBluetoothDevices.setOnClickListener(v->{
             if(discoverBluetoothDevices.getText()=="Discover Peers"){
                 bluetoothPeerDevicesMap.clear();
-                peerDevicesAdapter = new DevicesListAdapter(requireContext(), bluetoothPeerDevicesMap);
+                peerDevicesAdapter = new BLTDevicesListAdapter(requireContext(), getActivity(),bluetoothPeerDevicesMap);
                 peerDevicesListView.setAdapter(peerDevicesAdapter);
                 discoverBluetoothDevices.setText("Stop Discovery");
                 connMngr.startBluetoothDiscovery();
@@ -103,13 +107,13 @@ public class BluetoothDebugSettingsFragment extends Fragment implements OnBlueto
     }
 
     @Override
-    public void onBluetoothDeviceDiscovered(String deviceName, String deviceAddress) {
+    public void onBluetoothDeviceDiscovered(String deviceName, BluetoothDevice device) {
         Log.i(TAG,"OnDeviceDiscovered");
 
         // Update the UI with the discovered device
-        bluetoothPeerDevicesMap.put(deviceName, deviceAddress);
+        bluetoothPeerDevicesMap.put(deviceName, device);
         Log.i(TAG, String.valueOf(bluetoothPeerDevicesMap.size()));
-        peerDevicesAdapter = new DevicesListAdapter(requireContext(), bluetoothPeerDevicesMap);
+        peerDevicesAdapter = new BLTDevicesListAdapter(requireContext(), getActivity(),bluetoothPeerDevicesMap);
         peerDevicesListView.setAdapter(peerDevicesAdapter);
 
     }

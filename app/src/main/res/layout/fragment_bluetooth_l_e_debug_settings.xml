@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".utils.debug.BluetoothLEDebugSettingsFragment">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/bluetoothLEDebugHeading"
+            style="@style/HeadingText3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Bluetooth LE Debug Settings"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/bluetoothLEDeviceNameText"
+            style="@style/HeadingText4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Bluetooth Device Name : "
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bluetoothLEDebugHeading" />
+
+
+
+        <Button
+            android:id="@+id/discoverBluetoothLEDevices"
+            style="@style/SquaredOffButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Discover\nAll Peers"
+            app:layout_constraintEnd_toStartOf="@+id/discoverKonnectBluetoothLEDevices"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bluetoothLEDeviceNameText" />
+
+
+        <Button
+            android:id="@+id/discoverKonnectBluetoothLEDevices"
+            style="@style/SquaredOffButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Discover\nKonnect Peers"
+            app:layout_constraintBottom_toBottomOf="@+id/discoverBluetoothLEDevices"
+            app:layout_constraintEnd_toStartOf="@+id/advertiseBLEDevice"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/discoverBluetoothLEDevices"
+            app:layout_constraintTop_toTopOf="@+id/discoverBluetoothLEDevices" />
+
+        <TextView
+            android:id="@+id/BLEPeerDevicesHeading"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:text="Peer Devices :"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/discoverBluetoothLEDevices" />
+
+        <ListView
+            android:id="@+id/bluetoothLEPeerDevicesList"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/BLEPeerDevicesHeading" />
+
+        <Button
+            android:id="@+id/advertiseBLEDevice"
+            style="@style/SquaredOffButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start\nBLE Advertising"
+            app:layout_constraintBottom_toBottomOf="@+id/discoverBluetoothLEDevices"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/discoverKonnectBluetoothLEDevices"
+            app:layout_constraintTop_toTopOf="@+id/discoverBluetoothLEDevices" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

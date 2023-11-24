@@ -14,32 +14,41 @@ import android.util.Log;
 
 import com.manet.konnect.utils.OnBluetoothDeviceDiscoveredListener;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @SuppressLint("MissingPermission")
-public class ConnectionManager {
+public class BLTConnectionManager {
     private static final int REQUEST_ENABLE_BT = 1;
     private Context context;
     private Activity activity;
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket bluetoothSocket;
-    private String TAG="ConnectionManager";
+    private String TAG="BLTConnectionManager";
 
-    private Map<String, String> bluetoothPeerDevicesMap = new HashMap<>();
+    private Map<String, BluetoothDevice> bluetoothPeerDevicesMap = new HashMap<>();
 
     private OnBluetoothDeviceDiscoveredListener listener;
 
-    public ConnectionManager(Context context,Activity activity) {
+    private final UUID myUUID;
+
+    public BLTConnectionManager(Context context, Activity activity) {
+        myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
         this.activity=activity;
         this.context=context;
-        TAG+=context.getClass().getSimpleName();
+
         bluetoothManager = context.getSystemService(BluetoothManager.class);
         bluetoothAdapter = bluetoothManager.getAdapter();
         isBluetoothAdapterFound();
         enableBluetoothIfNot();
+    }
+
+    public BluetoothAdapter getBluetoothAdapter(){
+        return bluetoothAdapter;
     }
 
     
@@ -69,27 +78,28 @@ public class ConnectionManager {
         return bluetoothAdapter.getName();
     }
     
-    public  Map<String, String> getBluetoothPairedDevicesMap(){
+    public  Map<String, BluetoothDevice> getBluetoothPairedDevicesMap(){
+        Log.i(TAG,"Getting BLT Paired Devices.");
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-        Map<String, String> bluetoothPairedDevicesMap = new HashMap<>();
+        Map<String, BluetoothDevice> bluetoothPairedDevicesMap = new HashMap<>();
         if (pairedDevices.size() > 0) {
             // There are paired devices. Get the name and address of each paired device.
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress(); // MAC address
                 Log.i(TAG,deviceName+" - "+deviceHardwareAddress);
-                bluetoothPairedDevicesMap.put(deviceName,deviceHardwareAddress);
+                bluetoothPairedDevicesMap.put(deviceName,device);
             }
         }
         else{
             Log.i(TAG,"There are no paired Bluetooth Devices.");
-            bluetoothPairedDevicesMap.put("No Paired Devices.","-");
+            bluetoothPairedDevicesMap.put("No Paired Devices.",null);
         }
         return bluetoothPairedDevicesMap;
     }
 
 
-    public  Map<String, String> getBluetoothPeerDevicesMap(){
+    public  Map<String, BluetoothDevice> getBluetoothPeerDevicesMap(){
         return bluetoothPeerDevicesMap;
     }
 
@@ -108,7 +118,6 @@ public class ConnectionManager {
 
     public void setOnBluetoothDeviceDiscoveredListener(OnBluetoothDeviceDiscoveredListener listener) {
         Log.i(TAG,"Bluetooth Device Discovery On.");
-
         this.listener = listener;
     }
     
@@ -125,10 +134,10 @@ public class ConnectionManager {
 
                 if (deviceName != null && deviceAddress != null) {
                     // Add the device to the map
-                    bluetoothPeerDevicesMap.put(deviceName, deviceAddress);
-                    Log.i(TAG,"BT DISC : "+deviceName+" - "+deviceAddress);
+                    bluetoothPeerDevicesMap.put(deviceName, device);
+                    Log.i(TAG,"BLT DISC : "+deviceName+" - "+deviceAddress);
                     if (listener != null) {
-                        listener.onBluetoothDeviceDiscovered(deviceName, deviceAddress);
+                        listener.onBluetoothDeviceDiscovered(deviceName, device);
                     }
                 }
             }
@@ -153,7 +162,28 @@ public class ConnectionManager {
     }
 
     public void connectToDevice(BluetoothDevice device) {
-        // Establish a Bluetooth connection to the selected device
+        BluetoothSocket socket = null;
+
+        try {
+            // Create a BluetoothSocket for the device using the UUID
+            socket = device.createRfcommSocketToServiceRecord(myUUID);
+
+            // Connect to the remote device
+            socket.connect();
+
+            Log.d(TAG+"BluetoothManager", "Connected to " + device.getName());
+        } catch (IOException e) {
+            // Handle connection errors
+            Log.e(TAG+"BluetoothManager", "Connection error: " + e.getMessage());
+
+            try {
+                // Close the socket on error
+                socket.close();
+            } catch (IOException closeException) {
+                Log.e(TAG+"BluetoothManager", "Error closing socket: " + closeException.getMessage());
+            }
+        }
+
     }
 
     public void sendData(byte[] data) {

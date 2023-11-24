@@ -1,5 +1,7 @@
 package com.manet.konnect.utils;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,31 +10,34 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 
 import com.manet.konnect.R;
+import com.manet.konnect.core.BLTConnectionManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DevicesListAdapter extends BaseAdapter {
+public class BLTDevicesListAdapter extends BaseAdapter {
     private Context context;
-    private List<String> pairedDeviceList;
-    private Map<String, String> bluetoothPairedDevicesMap;
+    private List<String> DeviceList;
+    private Map<String, BluetoothDevice> bluetoothDevicesMap;
     private String TAG="PairedDevicesListAdapter";
+    private BLTConnectionManager connMngr;
 
-    public DevicesListAdapter(Context context, Map<String, String> bluetoothPairedDevicesMap) {
+    public BLTDevicesListAdapter(Context context, Activity activity, Map<String, BluetoothDevice> bluetoothPairedDevicesMap) {
         this.context = context;
-        this.bluetoothPairedDevicesMap= bluetoothPairedDevicesMap;
-        this.pairedDeviceList= new ArrayList<>(bluetoothPairedDevicesMap.keySet());
+        this.bluetoothDevicesMap = bluetoothPairedDevicesMap;
+        this.DeviceList = new ArrayList<>(bluetoothPairedDevicesMap.keySet());
+        this.connMngr=new BLTConnectionManager(context,activity);
     }
 
     @Override
     public int getCount() {
-        return pairedDeviceList.size();
+        return DeviceList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return pairedDeviceList.get(position);
+        return DeviceList.get(position);
     }
 
     @Override
@@ -48,7 +53,7 @@ public class DevicesListAdapter extends BaseAdapter {
         }
 
         Button bluetoothDeviceButton = convertView.findViewById(R.id.bluetoothDeviceButton);
-        final String deviceName = pairedDeviceList.get(position);
+        final String deviceName = DeviceList.get(position);
         bluetoothDeviceButton.setText(deviceName);
 
         bluetoothDeviceButton.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +63,9 @@ public class DevicesListAdapter extends BaseAdapter {
 
                 }
                 else{
-
+                    //BluetoothDevice device=connMngr.getBluetoothAdapter().getRemoteDevice(bluetoothDevicesMap.get(deviceName));
+                    BluetoothDevice device=bluetoothDevicesMap.get(deviceName);
+                    connMngr.connectToDevice(device);
                     //Logic to Connect to the given bluetooth device.
                 }
             }

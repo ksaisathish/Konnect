@@ -8,16 +8,18 @@
 
     <ImageView
         android:id="@+id/appLogo"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="256dp"
+        android:layout_height="512dp"
         android:layout_marginStart="64dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="64dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/SplashScreenTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/konnect_logo_final" />
+        app:srcCompat="@drawable/logo" />
 
     <TextView
         android:id="@+id/SplashScreenTitle"

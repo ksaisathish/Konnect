@@ -8,12 +8,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -43,6 +45,7 @@ public class PermissionManager extends AppCompatActivity {
 
 
 
+
     private void initPermissionRequestCodes() {
         permissionRequestCodes = new HashMap<>();
         // Map each permission to its respective request code
@@ -52,6 +55,11 @@ public class PermissionManager extends AppCompatActivity {
         permissionRequestCodes.put(Manifest.permission.CHANGE_WIFI_STATE, 104);
         permissionRequestCodes.put(Manifest.permission.BLUETOOTH, 105);
         permissionRequestCodes.put(Manifest.permission.BLUETOOTH_ADMIN, 106);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissionRequestCodes.put(Manifest.permission.BLUETOOTH_SCAN, 107);
+            permissionRequestCodes.put(Manifest.permission.BLUETOOTH_ADVERTISE, 108);
+        }
         // Add more permissions and request codes as needed
     }
 
