@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.manet.konnect.R;
+import com.manet.konnect.db.DatabaseUtils;
+import com.manet.konnect.db.entity.ProfileEntity;
 import com.manet.konnect.utils.Constants;
 
 import org.json.JSONObject;
@@ -44,10 +46,13 @@ public class RegistrationActivity extends AppCompatActivity {
     TextInputEditText fullname, phonenumber, email, userid;
     TextInputLayout fullnameLayout, phonenumberLayout, emailLayout, useridLayout;
     CheckBox tandcs;
+    private DatabaseUtils databaseUtils;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+        databaseUtils = DatabaseUtils.getInstance(this);
 
         registerButton= findViewById(R.id.registerButton);
         fullname=findViewById(R.id.nameInputField);
@@ -165,8 +170,32 @@ public class RegistrationActivity extends AppCompatActivity {
 
             int responseCode = registerConnection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                String hash=null;
+                try (InputStream inputStream = registerConnection.getInputStream();
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream)))
+                {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    // Parse JSON response
+                    JSONObject jsonResponse = new JSONObject(response.toString());
+
+                    // Check if 'isAvailable' flag exists in JSON
+                    if (jsonResponse.has("hash")) {
+                        hash = jsonResponse.getString("hash");
+                        Log.i(TAG,"Hash Received : "+hash);
+                    }
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
                 // Registration successful
-                registrationResult = 0; // Success
+                if(hash!=null) {
+                    registrationResult = 0; // Success
+                    storeProfileDetailsToDB(fullName, phoneNumber, email, userId, hash);
+                }
             } else {
                 // Registration failed
                 registrationResult = responseCode; // Error code
@@ -177,6 +206,16 @@ public class RegistrationActivity extends AppCompatActivity {
         }
 
         return registrationResult;
+    }
+
+    private void storeProfileDetailsToDB(String fullName, String phoneNumber, String email, String userId, String hash) {
+        ProfileEntity profile = new ProfileEntity();
+        profile.setUserid(userId);
+        profile.setFullName(fullName);
+        profile.setPhoneNumber(phoneNumber);
+        profile.setEmail(email);
+        profile.setKonnectHash(hash);
+        databaseUtils.insertProfile(profile);
     }
 
     private int checkUserIdAvailability(String userId) {
