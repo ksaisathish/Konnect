@@ -6,8 +6,8 @@
         <item name="colorPrimaryVariant">@color/konnectRedDark</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/purple_200</item>
-        <item name="colorSecondaryVariant">@color/purple_700</item>
+        <item name="colorSecondary">@color/konnectRedLight</item>
+        <item name="colorSecondaryVariant">@color/konnectRedDark</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/konnectRed</item>

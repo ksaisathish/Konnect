@@ -19,7 +19,7 @@ public class GetStartedActivity extends AppCompatActivity {
 
         startButton.setOnClickListener(v -> {
             // Create an Intent to start the next activity
-            Intent intent = new Intent(GetStartedActivity.this, MainActivity.class);
+            Intent intent = new Intent(GetStartedActivity.this, RegistrationActivity.class);
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
