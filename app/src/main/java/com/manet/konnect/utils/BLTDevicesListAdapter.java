@@ -20,7 +20,7 @@ public class BLTDevicesListAdapter extends BaseAdapter {
     private Context context;
     private List<String> DeviceList;
     private Map<String, BluetoothDevice> bluetoothDevicesMap;
-    private String TAG="PairedDevicesListAdapter";
+    private String TAG="BLTDevicesListAdapter";
     private BLTConnectionManager connMngr;
 
     public BLTDevicesListAdapter(Context context, Activity activity, Map<String, BluetoothDevice> bluetoothPairedDevicesMap) {

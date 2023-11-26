@@ -3,12 +3,107 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".utils.debug.WifiDirectDebugSettingsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/wifiDirectDebugHeading"
+            style="@style/HeadingText3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Wi-Fi Direct Debug Settings"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/isWifiDirectSupportedText"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="isWifiDirectSupported : "
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/wifiDirectDebugHeading" />
+
+        <TextView
+            android:id="@+id/isWifiDirectEnabledText"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="isWifiDirectEnabled : "
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/isWifiDirectSupportedText" />
+
+        <TextView
+            android:id="@+id/wifiDirectDeviceName"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Wifi Direct Device Name : "
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/isWifiDirectEnabledText" />
+
+
+        <TextView
+            android:id="@+id/wifiDirectDevicesHeading"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:text="Wi-Fi Direct Peers : "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/wifiDirectDeviceName" />
+
+        <ListView
+            android:id="@+id/wifiDirectDevicesList"
+            android:layout_width="0dp"
+            android:layout_height="250dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/wifiDirectDevicesHeading" />
+
+        <Button
+            android:id="@+id/discoverWifiDirectDevices"
+            style="@style/SquaredOffButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Discover Wi-FI \nDirect Devices"
+            app:layout_constraintBottom_toBottomOf="@+id/makeWifiDirectDeviceDiscoverable"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/makeWifiDirectDeviceDiscoverable"
+            app:layout_constraintTop_toTopOf="@+id/makeWifiDirectDeviceDiscoverable" />
+
+        <Button
+            android:id="@+id/makeWifiDirectDeviceDiscoverable"
+            style="@style/SquaredOffButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Make Wi-FI Direct \nDevice Discoverable"
+            app:layout_constraintEnd_toStartOf="@+id/discoverWifiDirectDevices"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/wifiDirectDevicesList" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </FrameLayout>

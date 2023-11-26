@@ -52,7 +52,6 @@ public class BluetoothDebugSettingsFragment extends Fragment implements OnBlueto
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG,"hERE");
         connMngr=new BLTConnectionManager(this.getContext(),this.getActivity());
 
     }

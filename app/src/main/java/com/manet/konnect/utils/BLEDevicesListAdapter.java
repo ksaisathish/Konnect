@@ -21,7 +21,7 @@ public class BLEDevicesListAdapter extends BaseAdapter {
     private Context context;
     private List<String> DeviceList;
     private Map<String, BluetoothDevice> bluetoothDevicesMap;
-    private String TAG="PairedDevicesListAdapter";
+    private String TAG="BLEDevicesListAdapter";
     private BLEConnectionManager connMngr;
 
     public BLEDevicesListAdapter(Context context, Activity activity, Map<String, BluetoothDevice> bluetoothPairedDevicesMap,BLEConnectionManager connMngr) {

@@ -59,36 +59,36 @@ public class WifiDirectManager {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
     }
 
+
+
     public void requestDeviceInfo() {
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            WifiP2pManager.DeviceInfoListener deviceInfoListener = new WifiP2pManager.DeviceInfoListener() {
-                @Override
-                public void onDeviceInfoAvailable(WifiP2pDevice device) {
-                    // Process the device information
-                    deviceName = device.deviceName;
-                    deviceMacAddress = device.deviceAddress;
-                    wifiP2pDevice = device;
-                    deviceInfoLatch.countDown(); // Release the latch
-                    // Do something with the device information
-                    // For example, log the device info
-                    Log.d(TAG, "Device Name: " + deviceName);
-                    Log.d(TAG, "Device Address: " + deviceMacAddress);
-                }
-            };
-            if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this.context, Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details
-                Log.i("Device", "Permissions Checked!!");
+        WifiP2pManager.DeviceInfoListener deviceInfoListener = new WifiP2pManager.DeviceInfoListener() {
+            @Override
+            public void onDeviceInfoAvailable(WifiP2pDevice device) {
+                // Process the device information
+                deviceName = device.deviceName;
+                deviceMacAddress = device.deviceAddress;
+                wifiP2pDevice = device;
+                deviceInfoLatch.countDown(); // Release the latch
+                // Do something with the device information
+                // For example, log the device info
+                Log.d(TAG, "Device Name: " + deviceName);
+                Log.d(TAG, "Device Address: " + deviceMacAddress);
             }
-            wifiP2pManager.requestDeviceInfo(channel, deviceInfoListener);
-
+        };
+        if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this.context, Manifest.permission.NEARBY_WIFI_DEVICES) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details
+            Log.i("Device", "Permissions Checked!!");
         }
+        wifiP2pManager.requestDeviceInfo(channel, deviceInfoListener);
+
     }
 
     public String getUniqueAndroidId() {
