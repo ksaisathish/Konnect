@@ -29,6 +29,7 @@ import com.manet.konnect.utils.WifiApsListAdapter;
 import com.manet.konnect.utils.WifiDirectDevicesListAdapter;
 import com.manet.konnect.utils.WifiDirectGroupDevicesListAdapter;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,7 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
         super.onCreate(savedInstanceState);
 
         connMngr=new WifiDirectConnectionManager(this.getContext(),this);
+        connMngr.requestDeviceInfo();
         wiFiDirectReceiver = new WiFiDirectDebugBroadcastReceiver(connMngr.getWifiP2pManager(), connMngr.getChannel(), this.getContext(),this);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -174,6 +176,8 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
     public void onWifiDirectGroupDevicesDiscovered(WifiP2pInfo info, List<WifiP2pDevice> peersList) {
         Log.i(TAG,"CALLED");
         HashMap<String, WifiP2pDevice> wifiDirectGroupDevicesMap=new HashMap<>();
+
+
         if(info.groupFormed){
             isWifiDirectGroupFormed.setText("isWifiDirectGroupFormed : True");
             for (WifiP2pDevice device:peersList) {
@@ -183,10 +187,8 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
             isWifiDirectGroupFormed.setText("isWifiDirectGroupFormed : False");
         }
 
-
-        wifiDirectGroupDevicesListAdapter=new WifiDirectGroupDevicesListAdapter(requireContext(),wifiDirectGroupDevicesMap);
+        wifiDirectGroupDevicesListAdapter=new WifiDirectGroupDevicesListAdapter(requireContext(),wifiDirectGroupDevicesMap,info);
         wifiDirectGroupDevicesListView.setAdapter(wifiDirectGroupDevicesListAdapter);
-
 
     }
 

@@ -1,7 +1,9 @@
 package com.manet.konnect.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +13,11 @@ import android.widget.Button;
 
 import com.manet.konnect.R;
 import com.manet.konnect.core.WifiDirectConnectionManager;
+import com.manet.konnect.utils.debug.ChatDebugActivity;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +28,14 @@ public class WifiDirectGroupDevicesListAdapter extends BaseAdapter {
     private List<String> DeviceList;
     private String TAG="WifiDirectDevicesListAdapter";
     private WifiDirectConnectionManager connMngr;
+    private WifiP2pInfo info;
 
-    public WifiDirectGroupDevicesListAdapter(Context context, Map<String, WifiP2pDevice> wifiDirectDeviceMap) {
+    public WifiDirectGroupDevicesListAdapter(Context context, Map<String, WifiP2pDevice> wifiDirectDeviceMap, WifiP2pInfo info) {
         this.context = context;
         this.connMngr= new WifiDirectConnectionManager(context,null);
         this.DeviceList = new ArrayList<>(wifiDirectDeviceMap.keySet());
         this.wifiDirectDeviceMap =wifiDirectDeviceMap;
+        this.info=info;
     }
 
     @Override
@@ -60,14 +67,13 @@ public class WifiDirectGroupDevicesListAdapter extends BaseAdapter {
         wifiDirectDeviceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(deviceName=="No Wifi Direct Devices Discovered."){
+                WifiP2pDevice device= wifiDirectDeviceMap.get(deviceName);
+                Log.i(TAG,"Trying to chat with "+deviceName);
+                Intent chatIntent = new Intent(context, ChatDebugActivity.class);
+                chatIntent.putExtra("isGroupOwner", info.isGroupOwner); // Indicate if this device is a group owner
+                chatIntent.putExtra("info",info);
+                context.startActivity(chatIntent);
 
-                }
-                else{
-                    WifiP2pDevice device= wifiDirectDeviceMap.get(deviceName);
-                    Log.i(TAG,"Trying to connect to "+device.deviceAddress);
-                    //connMngr.connectToDevice(device,null);
-                }
             }
         });
         return convertView;

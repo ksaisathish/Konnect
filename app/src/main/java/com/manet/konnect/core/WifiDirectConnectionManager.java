@@ -16,7 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-public class WifiDirectConnectionManager {
+public class
+WifiDirectConnectionManager {
     private final Context context;
     private String wifiP2pDeviceName;
     private String wifiP2pDeviceMacAddress;
@@ -42,7 +43,7 @@ public class WifiDirectConnectionManager {
         this.wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         this.discoveredDeviceMap = new HashMap<>();
 
-        requestDeviceInfo();
+        //requestDeviceInfo();
         initializationListener=listener;
 
     }

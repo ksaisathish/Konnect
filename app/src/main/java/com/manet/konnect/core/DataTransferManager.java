@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.function.LongFunction;
 
 public class DataTransferManager {
 
@@ -32,28 +33,31 @@ public class DataTransferManager {
         this.chatInterface=chatInterface;
         this.channel = channel;
         this.wifiP2pManager = wifiP2pManager;
+        Log.i(TAG,"Inside DataTransferManager");
 
         this.isGroupOwner = info.isGroupOwner;
         if (info.groupFormed && info.isGroupOwner) {
+            Log.i(TAG,"HERE1");
             startServerSocket();
         } else if (info.groupFormed) {
+
+            Log.i(TAG,"HERE2");
             connectToGroupOwner(info.groupOwnerAddress.getHostAddress());
         }
+
+        Log.i(TAG,"HERE3");
     }
     private void startServerSocket() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    serverSocket = new ServerSocket(PORT);
-                    socket = serverSocket.accept();
-
-                    while (true) {
-                        receiveFromOtherDevice();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            try {
+                serverSocket = new ServerSocket(PORT);
+                socket = serverSocket.accept();
+                Log.i(TAG,"Server Socket Created!");
+                while (true) {
+                    receiveFromOtherDevice();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -64,7 +68,7 @@ public class DataTransferManager {
             public void run() {
                 try {
                     socket = new Socket(hostAddress, PORT);
-
+                    Log.i(TAG,"Connected to Group Owner.");
                     while (true) {
                         receiveFromOtherDevice();
                     }
@@ -81,13 +85,14 @@ public class DataTransferManager {
             byte[] buffer = new byte[1024];
             int bytesRead = inputStream.read(buffer);
             String receivedMessage = new String(buffer, 0, bytesRead);
+
+            Log.i(TAG,"Received Message : "+receivedMessage);
             // Assuming 'receivedMessage' is the message received from the other device
-            MessageItem messageItem = new MessageItem(socket.getInetAddress().toString(),receivedMessage);
+            MessageItem messageItem = new MessageItem("Other",receivedMessage);
 
             // After receiving the message, call the loadReceivedMessage() method of ChatInterface
             chatInterface.loadReceivedMessage(messageItem);
             // Handle received message as needed
-            Log.d(TAG, "Received message: " + receivedMessage);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -100,6 +105,8 @@ public class DataTransferManager {
                 try {
                     OutputStream outputStream = socket.getOutputStream();
                     outputStream.write(message.getBytes());
+
+                    Log.i(TAG,"Sent Message - "+message);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

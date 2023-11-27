@@ -59,8 +59,10 @@ public class PermissionManager extends AppCompatActivity {
             permissionRequestCodes.put(Manifest.permission.BLUETOOTH_SCAN, 107);
             permissionRequestCodes.put(Manifest.permission.BLUETOOTH_ADVERTISE, 108);
         }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionRequestCodes.put(Manifest.permission.NEARBY_WIFI_DEVICES,109);
+            permissionRequestCodes.put(Manifest.permission.BLUETOOTH_CONNECT,109);
+            permissionRequestCodes.put(Manifest.permission.NEARBY_WIFI_DEVICES,110);
         }
 
         // Add more permissions and request codes as needed
