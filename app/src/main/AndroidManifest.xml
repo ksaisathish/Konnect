@@ -29,6 +29,9 @@
         android:theme="@style/Theme.Konnect"
         tools:targetApi="31">
         <activity
+            android:name=".utils.debug.ChatDebugActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.RegistrationActivity"
             android:exported="false" />
         <activity

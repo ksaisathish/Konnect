@@ -51,6 +51,14 @@ public class WifiDirectConnectionManager {
         return wifiP2pDeviceName;
     }
 
+    public WifiP2pManager getWifiP2pManager() {
+        return wifiP2pManager;
+    }
+
+    public WifiP2pManager.Channel getChannel() {
+        return channel;
+    }
+
     @SuppressLint("MissingPermission")
     public void requestDeviceInfo() {
 
@@ -135,9 +143,13 @@ public class WifiDirectConnectionManager {
             public void onFailure(int reason) {
                 Log.e(TAG, "Failed to create a group: " + reason);
                 showToast("Failed to start discovery. Try again in sometime!",Toast.LENGTH_SHORT);
+                if(reason==2){
+                    stopDeviceDiscovery(null);
+                }
                 if (actionListener != null) {
                     actionListener.onFailure(reason);
                 }
+
             }
         });
     }
@@ -169,8 +181,28 @@ public class WifiDirectConnectionManager {
     public void connectToDevice(WifiP2pDevice device, WifiP2pManager.ActionListener actionListener) {
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.deviceAddress;
-        wifiP2pManager.connect(channel, config, actionListener);
+
+        wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "Connection initiated with device: " + device.deviceName);
+                showToast("Connection initiated with device: "+device.deviceName,Toast.LENGTH_SHORT);
+                if (actionListener != null) {
+                    actionListener.onSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.e(TAG, "Failed to connect to device: " + device.deviceName + ", Reason: " + reason);
+                showToast("Failed to connect to device: " + device.deviceName,Toast.LENGTH_SHORT);
+                if (actionListener != null) {
+                    actionListener.onFailure(reason);
+                }
+            }
+        });
     }
+
 
     // Method to store discovered device details in the device map
     public void addDevice(String deviceName, WifiP2pDevice device) {
@@ -201,12 +233,6 @@ public class WifiDirectConnectionManager {
         return false;
     }
 
-    // Method to retrieve a list of available WiFi Direct devices
-    @SuppressLint("MissingPermission")
-    public void requestPeers(WifiP2pManager.PeerListListener peerListListener) {
-        wifiP2pManager.requestPeers(channel, peerListListener);
-    }
-
     // Method to retrieve detailed information about a WiFi Direct device
     @SuppressLint("MissingPermission")
     public void requestDeviceDetails(WifiP2pDevice device, WifiP2pManager.ActionListener actionListener) {
@@ -232,6 +258,7 @@ public class WifiDirectConnectionManager {
             }
         });
     }
+
     public void setOnWifiDirectDevicesDiscoveredListener(OnWifiDirectDevicesDiscoveredListener listener) {
         Log.i(TAG,"Finding WifI Direct Devices Listener On.");
         this.listener = listener;

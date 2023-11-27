@@ -121,4 +121,9 @@
         <item name="fontFamily">@font/montserrat_semibold</item>
         <item name="android:textSize">16sp</item>
     </style>
+
+    <style name="HeadingText5" parent="Theme.Material3.Dark">
+        <item name="fontFamily">@font/montserrat_semibold</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 </resources>

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class WifiDirectDevicesListAdapter  extends BaseAdapter {
+public class WifiDirectGroupDevicesListAdapter extends BaseAdapter {
     private Context context;
     Map<String, WifiP2pDevice> wifiDirectDeviceMap;
 
@@ -24,7 +24,7 @@ public class WifiDirectDevicesListAdapter  extends BaseAdapter {
     private String TAG="WifiDirectDevicesListAdapter";
     private WifiDirectConnectionManager connMngr;
 
-    public WifiDirectDevicesListAdapter(Context context,  Map<String, WifiP2pDevice> wifiDirectDeviceMap) {
+    public WifiDirectGroupDevicesListAdapter(Context context, Map<String, WifiP2pDevice> wifiDirectDeviceMap) {
         this.context = context;
         this.connMngr= new WifiDirectConnectionManager(context,null);
         this.DeviceList = new ArrayList<>(wifiDirectDeviceMap.keySet());
@@ -66,7 +66,7 @@ public class WifiDirectDevicesListAdapter  extends BaseAdapter {
                 else{
                     WifiP2pDevice device= wifiDirectDeviceMap.get(deviceName);
                     Log.i(TAG,"Trying to connect to "+device.deviceAddress);
-                    connMngr.connectToDevice(device,null);
+                    //connMngr.connectToDevice(device,null);
                 }
             }
         });
