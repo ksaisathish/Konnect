@@ -55,7 +55,6 @@ public class SplashScreenActivity extends AppCompatActivity {
     };
 
 
-
     private void checkPermissionsAndMoveToNextActivity() {
         Log.i(TAG,"Into the function");
 

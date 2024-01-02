@@ -117,6 +117,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/makeWifiDirectDeviceDiscoverable" />
 
+        <TextView
+            android:id="@+id/isWifiDirectGroupOwner"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="isWifiDirectGroupOwner : "
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/isWifiDirectGroupFormed" />
+
 
         <TextView
             android:id="@+id/wifiDirectGroupDevicesHeading"
@@ -127,7 +138,7 @@
             android:layout_marginTop="8dp"
             android:text="Wi-Fi Direct Peers in Group (Chat): "
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/isWifiDirectGroupFormed" />
+            app:layout_constraintTop_toBottomOf="@+id/isWifiDirectGroupOwner" />
 
         <ListView
             android:id="@+id/wifiDirectGroupDevicesList"

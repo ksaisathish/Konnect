@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.manet.konnect.R;
 import com.manet.konnect.core.WifiConnectionManager;
@@ -49,7 +50,7 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
     WifiDirectDevicesListAdapter wifiDirectDevicesListAdapter;
     WifiDirectGroupDevicesListAdapter wifiDirectGroupDevicesListAdapter;
     WifiDirectConnectionManager connMngr;
-    TextView isWifiDirectSupported, getIsWifiDirectEnabled,wifiDirectDeviceName,isWifiDirectGroupFormed;
+    TextView isWifiDirectSupported, getIsWifiDirectEnabled,wifiDirectDeviceName,isWifiDirectGroupFormed,isWifiDirectGroupOwner;
 
     ListView wifiDirectDevicesListView,wifiDirectGroupDevicesListView;
 
@@ -88,8 +89,8 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
         super.onCreate(savedInstanceState);
 
         connMngr=new WifiDirectConnectionManager(this.getContext(),this);
-        connMngr.requestDeviceInfo();
-        wiFiDirectReceiver = new WiFiDirectDebugBroadcastReceiver(connMngr.getWifiP2pManager(), connMngr.getChannel(), this.getContext(),this);
+        //connMngr.requestDeviceInfo();
+        wiFiDirectReceiver = new WiFiDirectDebugBroadcastReceiver(connMngr, this.getContext(),this);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -118,10 +119,12 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
         discoverWifiDirectDevices=rootView.findViewById(R.id.discoverWifiDirectDevices);
         wifiDirectDevicesListView=rootView.findViewById(R.id.wifiDirectDevicesList);
         isWifiDirectSupported=rootView.findViewById(R.id.isWifiDirectSupportedText);
+
         getIsWifiDirectEnabled=rootView.findViewById(R.id.isWifiDirectEnabledText);
         wifiDirectDeviceName=rootView.findViewById(R.id.wifiDirectDeviceName);
 
         isWifiDirectGroupFormed=rootView.findViewById(R.id.isWifiDirectGroupFormed);
+        isWifiDirectGroupOwner=rootView.findViewById(R.id.isWifiDirectGroupOwner);
         wifiDirectGroupDevicesListView=rootView.findViewById(R.id.wifiDirectGroupDevicesList);
 
         makeWifiDirectDeviceDiscoverable=rootView.findViewById(R.id.makeWifiDirectDeviceDiscoverable);
@@ -180,16 +183,53 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
 
         if(info.groupFormed){
             isWifiDirectGroupFormed.setText("isWifiDirectGroupFormed : True");
+            if(info.isGroupOwner){
+                isWifiDirectGroupOwner.setText("isWifiDirectGroupOwner : True");
+            }
+            else{
+                isWifiDirectGroupOwner.setText("isWifiDirectGroupOwner : False");
+            }
             for (WifiP2pDevice device:peersList) {
                 wifiDirectGroupDevicesMap.put(device.deviceName,device);
             }
         }else{
             isWifiDirectGroupFormed.setText("isWifiDirectGroupFormed : False");
+            isWifiDirectGroupOwner.setText("isWifiDirectGroupOwner : False");
+
         }
 
         wifiDirectGroupDevicesListAdapter=new WifiDirectGroupDevicesListAdapter(requireContext(),wifiDirectGroupDevicesMap,info);
         wifiDirectGroupDevicesListView.setAdapter(wifiDirectGroupDevicesListAdapter);
 
+    }
+
+    @Override
+    public void onPeerDevicesDiscovered(List<WifiP2pDevice> peersList) {
+        HashMap<String, WifiP2pDevice> wifiDirectPeerDevicesMap=new HashMap<>();
+        boolean isFound=false;
+        if(peersList!=null ){
+            if(peersList.size()!=0){
+                isFound=true;
+                for (WifiP2pDevice device:peersList) {
+                wifiDirectPeerDevicesMap.put(device.deviceName,device);
+                }
+            }
+
+        }
+        if(!isFound){
+            wifiDirectPeerDevicesMap.put("No Wifi Direct Devices Discovered.",null);
+            Log.i(TAG,"No Wifi Direct Devices Discovered.");
+            showToast("No Wifi Direct Devices Discovered.", Toast.LENGTH_SHORT);
+        }
+
+
+        wifiDirectDevicesListAdapter=new WifiDirectDevicesListAdapter(requireContext(),wifiDirectPeerDevicesMap);
+        wifiDirectDevicesListView.setAdapter(wifiDirectDevicesListAdapter);
+    }
+
+    private void showToast(String message, int duration) {
+        Toast toast = Toast.makeText(requireContext(), message, duration);
+        toast.show();
     }
 
 }

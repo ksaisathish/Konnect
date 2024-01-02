@@ -43,7 +43,7 @@ public class ChatDebugActivity extends AppCompatActivity implements ChatInterfac
         WifiP2pInfo wifiP2pInfo=getIntent().getParcelableExtra("info");
 
         wifiDirectConnectionManager =new WifiDirectConnectionManager(getApplicationContext(),null);
-        dataTransferManager=new DataTransferManager(this,getApplicationContext(),wifiDirectConnectionManager.getChannel(),wifiDirectConnectionManager.getWifiP2pManager(),wifiP2pInfo);
+        dataTransferManager=new DataTransferManager(this,getApplicationContext(),wifiDirectConnectionManager,wifiP2pInfo);
         Log.i(TAG,"Data Transfer Manager called");
         chatRecipientName=findViewById(R.id.chatRecipientName);
         messagesListView = findViewById(R.id.messagesList);

@@ -32,7 +32,9 @@ public class GetStartedActivity extends AppCompatActivity {
                     finish(); // Finish the splash activity
                 } else {
                     // Profile doesn't exist, navigate to RegistrationActivity
-                    startActivity(new Intent(GetStartedActivity.this, RegistrationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    startActivity(new Intent(GetStartedActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+                    finish();
+                    //startActivity(new Intent(GetStartedActivity.this, RegistrationActivity.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
             });
 

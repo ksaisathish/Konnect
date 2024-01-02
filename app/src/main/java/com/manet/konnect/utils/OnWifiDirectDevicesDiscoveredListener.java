@@ -10,4 +10,6 @@ public interface OnWifiDirectDevicesDiscoveredListener {
     void onWifiDirectDevicesDiscovered(HashMap<String, WifiP2pDevice> wifiDirectDevicesMap);
 
     void onWifiDirectGroupDevicesDiscovered(WifiP2pInfo info, List<WifiP2pDevice> peersList);
+
+    void onPeerDevicesDiscovered(List<WifiP2pDevice> peersList);
 }

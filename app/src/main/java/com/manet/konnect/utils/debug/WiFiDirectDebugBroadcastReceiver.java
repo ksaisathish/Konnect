@@ -9,6 +9,7 @@
     import android.net.wifi.p2p.WifiP2pManager;
     import android.util.Log;
 
+    import com.manet.konnect.core.WifiDirectConnectionManager;
     import com.manet.konnect.utils.OnWifiDirectDevicesDiscoveredListener;
 
     import java.util.ArrayList;
@@ -23,14 +24,18 @@
 
         private List<WifiP2pDevice> peersList;
         private OnWifiDirectDevicesDiscoveredListener listener;
+        WifiDirectConnectionManager connMngr;
 
-        public WiFiDirectDebugBroadcastReceiver(WifiP2pManager manager, WifiP2pManager.Channel channel,
+        public WiFiDirectDebugBroadcastReceiver(WifiDirectConnectionManager connMngr,
                                                 Context context, OnWifiDirectDevicesDiscoveredListener listener) {
             super();
-            this.wifiP2pManager = manager;
-            this.channel = channel;
+            this.connMngr=connMngr;
+            this.wifiP2pManager = connMngr.getWifiP2pManager();
+            this.channel = connMngr.getChannel();
             this.context = context;
             this.listener=listener;
+
+            wifiP2pManager.requestConnectionInfo(channel, connectionInfoListener);
         }
 
         @SuppressLint("MissingPermission")
@@ -104,6 +109,7 @@
         private WifiP2pManager.PeerListListener peerListListener = peerList -> {
             //peersList=peerList.getDeviceList();
             // Handle the list of available peers
+            //listener.onPeerDevicesDiscovered(peersList);
             // For example: iterate through peerList to get device details
         };
 
@@ -121,8 +127,13 @@
 
                                     List<WifiP2pDevice> clientList = new ArrayList<>(group.getClientList());
                                     if(!info.isGroupOwner) {
+                                        Log.i(TAG,"Size 1 : "+group.getClientList().size() );
+                                        Log.i(TAG,"Size 2 : "+clientList.size() );
                                         clientList.add(group.getOwner());
+
                                     }
+                                    connMngr.setGroupDevicesList(clientList);
+
                                     Log.d(TAG, "Other Peers present in the group."+clientList.size());
                                     listener.onWifiDirectGroupDevicesDiscovered(info,clientList);
 

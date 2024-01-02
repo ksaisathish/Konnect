@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Looper;
 import android.util.Log;
@@ -12,7 +13,11 @@ import android.widget.Toast;
 
 import com.manet.konnect.utils.OnWifiDirectDevicesDiscoveredListener;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -26,6 +31,7 @@ WifiDirectConnectionManager {
     private final WifiP2pManager.Channel channel;
     private final WifiManager wifiManager;
     private final Map<String, WifiP2pDevice> discoveredDeviceMap;
+    public List<WifiP2pDevice> groupClientDevices;
     private final String TAG="WifiDirectConnectionManager";
     private CountDownLatch deviceInfoLatch;
 
@@ -43,7 +49,7 @@ WifiDirectConnectionManager {
         this.wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         this.discoveredDeviceMap = new HashMap<>();
 
-        //requestDeviceInfo();
+        requestDeviceInfo();
         initializationListener=listener;
 
     }
@@ -64,9 +70,9 @@ WifiDirectConnectionManager {
     public void requestDeviceInfo() {
 
         deviceInfoLatch = new CountDownLatch(1);
-        WifiP2pManager.DeviceInfoListener deviceInfoListener = new WifiP2pManager.DeviceInfoListener() {
-            @Override
-            public void onDeviceInfoAvailable(WifiP2pDevice device) {
+
+        WifiP2pManager.DeviceInfoListener deviceInfoListener = device -> {
+            if(device!=null) {
                 // Process the device information
                 wifiP2pDeviceName = device.deviceName;
                 wifiP2pDeviceMacAddress = device.deviceAddress;
@@ -74,8 +80,11 @@ WifiDirectConnectionManager {
                 deviceInfoLatch.countDown(); // Release the latch
                 Log.d(TAG, "Device Name: " + wifiP2pDeviceName);
                 Log.d(TAG, "Device Address: " + wifiP2pDeviceMacAddress);
-                if(initializationListener!=null)
+                if (initializationListener != null)
                     initializationListener.onConnectionManagerInitialized();
+            }
+            else{
+                deviceInfoLatch.countDown();
             }
         };
         wifiP2pManager.requestDeviceInfo(channel, deviceInfoListener);
@@ -145,7 +154,7 @@ WifiDirectConnectionManager {
                 Log.e(TAG, "Failed to create a group: " + reason);
                 showToast("Failed to start discovery. Try again in sometime!",Toast.LENGTH_SHORT);
                 if(reason==2){
-                    stopDeviceDiscovery(null);
+                    disconnect(null);
                 }
                 if (actionListener != null) {
                     actionListener.onFailure(reason);
@@ -218,6 +227,7 @@ WifiDirectConnectionManager {
 
     // Method to disconnect from a connected WiFi Direct device
     public void disconnect(WifiP2pManager.ActionListener actionListener) {
+        Log.i(TAG,"Starting Wifi Direct Disconnect.");
         wifiP2pManager.removeGroup(channel, actionListener);
     }
 
@@ -269,6 +279,36 @@ WifiDirectConnectionManager {
         Toast toast = Toast.makeText(context, message, duration);
         toast.show();
     }
+
+    @SuppressLint("MissingPermission")
+    public void setGroupDevicesList(List<WifiP2pDevice> groupClientList){
+
+        groupClientDevices=groupClientList;
+    }
+
+
+    public String getDeviceNameFromSocketAddress(InetAddress socketAddress) {
+        String deviceName = null;
+        if(groupClientDevices==null){
+            return socketAddress.getHostAddress();
+        }
+        // Assuming wifiP2pDeviceList is a list of WifiP2pDevice objects representing devices in the Wi-Fi Direct group
+        for (WifiP2pDevice device : groupClientDevices) {
+            try {
+                InetAddress deviceAddress = InetAddress.getByName(device.deviceAddress);
+                if (deviceAddress != null && deviceAddress.equals(socketAddress)) {
+                    deviceName = device.deviceName;
+                    break;
+                }
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                deviceName="UnNamed Host";
+            }
+        }
+
+        return deviceName;
+    }
+
 
     // Additional methods for managing group owner, service discovery, etc., to be added here
 }
