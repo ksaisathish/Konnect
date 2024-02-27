@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".utils.debug.NearbyConnectionsDebugSettingsFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/nearbyConnectionsDebugHeading"
+            style="@style/HeadingText3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:text="Nearby Connections Debug Settings"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/localUserName"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Local User Name : "
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nearbyConnectionsDebugHeading" />
+
+
+        <TextView
+            android:id="@+id/nearbyConnectionsDevicesHeading"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:text="Nearby Connections (Discovered) : "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/localUserName" />
+
+        <ListView
+            android:id="@+id/nearbyConnectionsDiscoveredDevicesList"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="24dp"
+            android:minHeight="100dp"
+            app:layout_constraintBottom_toTopOf="@+id/discoverNearbyConnectionsDevices"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nearbyConnectionsDevicesHeading" />
+
+        <Button
+            android:id="@+id/discoverNearbyConnectionsDevices"
+            style="@style/SquaredOffButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Discover Nearby \nConnection Devices"
+            app:layout_constraintBottom_toBottomOf="@+id/startNearbyConnectionsAdvertising"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/startNearbyConnectionsAdvertising"
+            app:layout_constraintTop_toTopOf="@+id/startNearbyConnectionsAdvertising" />
+
+        <Button
+            android:id="@+id/startNearbyConnectionsAdvertising"
+            style="@style/SquaredOffButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Start Nearby Connections \nAdvertising"
+            app:layout_constraintEnd_toStartOf="@+id/discoverNearbyConnectionsDevices"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nearbyConnectionsDiscoveredDevicesList" />
+
+
+        <TextView
+            android:id="@+id/nearbyConnectionsGroupDevicesHeading"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:text="Nearby Connections - Connected (Chat): "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/startNearbyConnectionsAdvertising" />
+
+        <ListView
+            android:id="@+id/nearbyConnectionsConnectedDevicesList"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nearbyConnectionsGroupDevicesHeading" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>

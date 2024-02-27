@@ -4,6 +4,7 @@ package com.manet.konnect.utils.debug;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.manet.konnect.R;
+import com.manet.konnect.core.ServerThread;
 import com.manet.konnect.core.WifiConnectionManager;
 import com.manet.konnect.core.WifiDirectConnectionManager;
 import com.manet.konnect.utils.BLTDevicesListAdapter;
@@ -53,6 +55,8 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
     TextView isWifiDirectSupported, getIsWifiDirectEnabled,wifiDirectDeviceName,isWifiDirectGroupFormed,isWifiDirectGroupOwner;
 
     ListView wifiDirectDevicesListView,wifiDirectGroupDevicesListView;
+
+    ServerThread sThread;
 
     private String TAG="WifiDirectDebugSettingsFragment";
 
@@ -89,6 +93,8 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
         super.onCreate(savedInstanceState);
 
         connMngr=new WifiDirectConnectionManager(this.getContext(),this);
+        sThread=new ServerThread(this.getContext());
+        //sThread.run();
         //connMngr.requestDeviceInfo();
         wiFiDirectReceiver = new WiFiDirectDebugBroadcastReceiver(connMngr, this.getContext(),this);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -145,10 +151,15 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
                     @Override
                     public void onSuccess() {
                         makeWifiDirectDeviceDiscoverable.setText("Stop Wifi Direct \nDevice Discovery");
+
                     }
 
                     @Override
-                    public void onFailure(int i) {}
+                    public void onFailure(int i) {
+                        if(i==2){
+                            makeWifiDirectDeviceDiscoverable.setText("Stop Wifi Direct \nDevice Discovery");
+                        }
+                    }
                 });
             }
             else{
@@ -168,10 +179,11 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
         return rootView;
     }
 
+
     @Override
     public void onWifiDirectDevicesDiscovered(HashMap<String, WifiP2pDevice> wifiDirectDevicesMap) {
         Log.i(TAG,"OnWifiDirectDevicesDiscovered");
-        wifiDirectDevicesListAdapter=new WifiDirectDevicesListAdapter(requireContext(),wifiDirectDevicesMap);
+        wifiDirectDevicesListAdapter=new WifiDirectDevicesListAdapter(requireContext(),wifiDirectDevicesMap,sThread);
         wifiDirectDevicesListView.setAdapter(wifiDirectDevicesListAdapter);
     }
 
@@ -190,7 +202,13 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
                 isWifiDirectGroupOwner.setText("isWifiDirectGroupOwner : False");
             }
             for (WifiP2pDevice device:peersList) {
-                wifiDirectGroupDevicesMap.put(device.deviceName,device);
+                if(device.deviceName.length()==0){
+                    wifiDirectGroupDevicesMap.put(device.deviceAddress,device);
+                }
+                else{
+                    wifiDirectGroupDevicesMap.put(device.deviceName,device);
+                }
+                Log.i(TAG,device.toString());
             }
         }else{
             isWifiDirectGroupFormed.setText("isWifiDirectGroupFormed : False");
@@ -198,7 +216,7 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
 
         }
 
-        wifiDirectGroupDevicesListAdapter=new WifiDirectGroupDevicesListAdapter(requireContext(),wifiDirectGroupDevicesMap,info);
+        wifiDirectGroupDevicesListAdapter=new WifiDirectGroupDevicesListAdapter(requireContext(),wifiDirectGroupDevicesMap,info,sThread);
         wifiDirectGroupDevicesListView.setAdapter(wifiDirectGroupDevicesListAdapter);
 
     }
@@ -223,13 +241,21 @@ public class WifiDirectDebugSettingsFragment extends Fragment implements WifiDir
         }
 
 
-        wifiDirectDevicesListAdapter=new WifiDirectDevicesListAdapter(requireContext(),wifiDirectPeerDevicesMap);
+        wifiDirectDevicesListAdapter=new WifiDirectDevicesListAdapter(requireContext(),wifiDirectPeerDevicesMap,sThread);
         wifiDirectDevicesListView.setAdapter(wifiDirectDevicesListAdapter);
     }
 
     private void showToast(String message, int duration) {
         Toast toast = Toast.makeText(requireContext(), message, duration);
         toast.show();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (sThread != null) {
+            sThread.closeServer(); // Custom method to close the server thread
+        }
     }
 
 }

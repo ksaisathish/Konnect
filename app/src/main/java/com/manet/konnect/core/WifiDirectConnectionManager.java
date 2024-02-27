@@ -1,6 +1,7 @@
 package com.manet.konnect.core;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -34,6 +35,7 @@ WifiDirectConnectionManager {
     public List<WifiP2pDevice> groupClientDevices;
     private final String TAG="WifiDirectConnectionManager";
     private CountDownLatch deviceInfoLatch;
+    private Activity activity;
 
     public interface InitializationListener {
         void onConnectionManagerInitialized();
@@ -42,7 +44,7 @@ WifiDirectConnectionManager {
     private InitializationListener initializationListener;
     private OnWifiDirectDevicesDiscoveredListener listener;
 
-    public WifiDirectConnectionManager(Context context, InitializationListener listener) {
+    public WifiDirectConnectionManager(Context context,InitializationListener listener) {
         this.context = context.getApplicationContext();
         this.wifiP2pManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
         this.channel = wifiP2pManager.initialize(context, Looper.getMainLooper(), null);
@@ -139,7 +141,13 @@ WifiDirectConnectionManager {
     // Method to make the device discoverable
     @SuppressLint("MissingPermission")
     public void makeDeviceDiscoverable(WifiP2pManager.ActionListener actionListener) {
-        wifiP2pManager.createGroup(channel, new WifiP2pManager.ActionListener() {
+
+        Log.i(TAG,"Trying to Set Customconfig for "+wifiP2pDeviceName);
+        WifiP2pConfig.Builder configBuilder = new WifiP2pConfig.Builder();
+        configBuilder.setNetworkName("DIRECT-KN-"+wifiP2pDeviceName);
+        configBuilder.setPassphrase("MySecretPassphrase");
+        WifiP2pConfig customConfig = configBuilder.build();
+        wifiP2pManager.createGroup(channel,customConfig, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 Log.d(TAG, "Device is now discoverable ");
@@ -152,8 +160,21 @@ WifiDirectConnectionManager {
             @Override
             public void onFailure(int reason) {
                 Log.e(TAG, "Failed to create a group: " + reason);
-                showToast("Failed to start discovery. Try again in sometime!",Toast.LENGTH_SHORT);
-                if(reason==2){
+
+                if(reason==1){
+                    showToast("Wifi P2P UnSupported!",Toast.LENGTH_SHORT);
+                    disconnect(null);
+                }
+                else if(reason==2){
+                    showToast("Device already in a group.",Toast.LENGTH_SHORT);
+                    //disconnect(null);
+                }
+                else if(reason==0){
+                    showToast("Internal Error! Try again in sometime!",Toast.LENGTH_SHORT);
+                    disconnect(null);
+                }
+                else{
+                    showToast("Failed to start discovery. Try again in sometime!",Toast.LENGTH_SHORT);
                     disconnect(null);
                 }
                 if (actionListener != null) {
@@ -190,6 +211,7 @@ WifiDirectConnectionManager {
     @SuppressLint("MissingPermission")
     public void connectToDevice(WifiP2pDevice device, WifiP2pManager.ActionListener actionListener) {
         WifiP2pConfig config = new WifiP2pConfig();
+
         config.deviceAddress = device.deviceAddress;
 
         wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
@@ -214,6 +236,10 @@ WifiDirectConnectionManager {
     }
 
 
+    public void connectToDeviceAsLegacy(WifiP2pDevice device){
+        WifiConnectionManager wifiManager=new WifiConnectionManager(context);
+        wifiManager.connectToWifi("DIRECT-KN-"+device.deviceName,"MySecretPassphrase");
+    }
     // Method to store discovered device details in the device map
     public void addDevice(String deviceName, WifiP2pDevice device) {
         discoveredDeviceMap.put(deviceName, device);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +13,11 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 
 import com.manet.konnect.R;
+import com.manet.konnect.core.ServerThread;
 import com.manet.konnect.core.WifiDirectConnectionManager;
 import com.manet.konnect.utils.debug.ChatDebugActivity;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +33,10 @@ public class WifiDirectGroupDevicesListAdapter extends BaseAdapter {
     private WifiDirectConnectionManager connMngr;
     private WifiP2pInfo info;
 
-    public WifiDirectGroupDevicesListAdapter(Context context, Map<String, WifiP2pDevice> wifiDirectDeviceMap, WifiP2pInfo info) {
+    private ServerThread sThread;
+    public WifiDirectGroupDevicesListAdapter(Context context, Map<String, WifiP2pDevice> wifiDirectDeviceMap, WifiP2pInfo info,ServerThread sThread) {
         this.context = context;
+        this.sThread=sThread;
         this.connMngr= new WifiDirectConnectionManager(context,null);
         this.DeviceList = new ArrayList<>(wifiDirectDeviceMap.keySet());
         this.wifiDirectDeviceMap =wifiDirectDeviceMap;
@@ -72,6 +77,9 @@ public class WifiDirectGroupDevicesListAdapter extends BaseAdapter {
                 Intent chatIntent = new Intent(context, ChatDebugActivity.class);
                 chatIntent.putExtra("isGroupOwner", info.isGroupOwner); // Indicate if this device is a group owner
                 chatIntent.putExtra("info",info);
+                chatIntent.putExtra("deviceName",deviceName);
+                //chatIntent.putExtra("serverThread", (Serializable) sThread);
+
                 context.startActivity(chatIntent);
 
             }

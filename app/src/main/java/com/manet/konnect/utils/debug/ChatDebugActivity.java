@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.manet.konnect.R;
 import com.manet.konnect.core.DataTransferManager;
+import com.manet.konnect.core.ServerThread;
 import com.manet.konnect.core.WifiDirectConnectionManager;
 import com.manet.konnect.utils.ChatInterface;
 import com.manet.konnect.utils.MessageDebugAdapter;
@@ -33,6 +34,9 @@ public class ChatDebugActivity extends AppCompatActivity implements ChatInterfac
     private WifiDirectConnectionManager wifiDirectConnectionManager;
     ArrayList<MessageItem> messageList;
 
+    ServerThread sThread;
+    String deviceName;
+
     private final String  TAG="ChatDebugActivity";
 
     @Override
@@ -41,11 +45,16 @@ public class ChatDebugActivity extends AppCompatActivity implements ChatInterfac
         setContentView(R.layout.activity_chat_debug);
         boolean isGroupOwner = getIntent().getBooleanExtra("isGroupOwner", false);
         WifiP2pInfo wifiP2pInfo=getIntent().getParcelableExtra("info");
+        deviceName=getIntent().getStringExtra("deviceName");
+        //sThread= (ServerThread) getIntent().getSerializableExtra("serverThread");
+
 
         wifiDirectConnectionManager =new WifiDirectConnectionManager(getApplicationContext(),null);
         dataTransferManager=new DataTransferManager(this,getApplicationContext(),wifiDirectConnectionManager,wifiP2pInfo);
         Log.i(TAG,"Data Transfer Manager called");
         chatRecipientName=findViewById(R.id.chatRecipientName);
+        chatRecipientName.setText(deviceName);
+
         messagesListView = findViewById(R.id.messagesList);
         messageBoxField = findViewById(R.id.messageBoxField);
         sendButton = findViewById(R.id.sendButton);
@@ -71,7 +80,6 @@ public class ChatDebugActivity extends AppCompatActivity implements ChatInterfac
                 messageAdapter = new MessageDebugAdapter(this, messageList);
 //                messageAdapter.addMessage(sentMessage);
                 messagesListView.setAdapter(messageAdapter);
-                // Clear the message box after sending
                 messageBoxField.getText().clear();
             }
         }
@@ -80,13 +88,12 @@ public class ChatDebugActivity extends AppCompatActivity implements ChatInterfac
     @Override
     public void loadReceivedMessage(MessageItem messageItem) {
         runOnUiThread(() -> {
+            messageItem.setPersonName(deviceName);
             messageList.add(messageItem);
 
             messageAdapter = new MessageDebugAdapter(this, messageList);
 //            messageAdapter.addMessage(messageItem);
             messagesListView.setAdapter(messageAdapter);
-            // Update UI or handle received message in your activity
-            // For example, display the received message in a TextView, ListView, etc.
             //Toast.makeText(this, "Received message: " + messageItem.getMessage(), Toast.LENGTH_SHORT).show();
         });
     }
@@ -95,12 +102,9 @@ public class ChatDebugActivity extends AppCompatActivity implements ChatInterfac
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Release any resources, unregister listeners, etc.
-        // For example, release the DataTransferManager instance if needed
         if (dataTransferManager != null) {
             // Clean up resources in DataTransferManager
             dataTransferManager.cleanup();
         }
-        // Other cleanup operations specific to ChatDebugActivity
     }
 }

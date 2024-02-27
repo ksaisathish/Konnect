@@ -10,6 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 
 import com.manet.konnect.R;
+import com.manet.konnect.core.ClientThread;
+import com.manet.konnect.core.ServerThread;
 import com.manet.konnect.core.WifiDirectConnectionManager;
 
 import java.util.ArrayList;
@@ -21,11 +23,13 @@ public class WifiDirectDevicesListAdapter  extends BaseAdapter {
     Map<String, WifiP2pDevice> wifiDirectDeviceMap;
 
     private List<String> DeviceList;
-    private String TAG="WifiDirectDevicesListAdapter";
+    private final String TAG="WifiDirectDevicesListAdapter";
     private WifiDirectConnectionManager connMngr;
+    private ServerThread sThread;
 
-    public WifiDirectDevicesListAdapter(Context context,  Map<String, WifiP2pDevice> wifiDirectDeviceMap) {
+    public WifiDirectDevicesListAdapter(Context context,  Map<String, WifiP2pDevice> wifiDirectDeviceMap,ServerThread sThread) {
         this.context = context;
+        this.sThread=sThread;
         this.connMngr= new WifiDirectConnectionManager(context,null);
         this.DeviceList = new ArrayList<>(wifiDirectDeviceMap.keySet());
         this.wifiDirectDeviceMap =wifiDirectDeviceMap;
@@ -57,17 +61,21 @@ public class WifiDirectDevicesListAdapter  extends BaseAdapter {
         final String deviceName = DeviceList.get(position);
         wifiDirectDeviceButton.setText(deviceName);
 
-        wifiDirectDeviceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(deviceName=="No Wifi Direct Devices Discovered."){
+        wifiDirectDeviceButton.setOnClickListener(v -> {
+            if(deviceName=="No Wifi Direct Devices Discovered."){
 
-                }
-                else{
-                    WifiP2pDevice device= wifiDirectDeviceMap.get(deviceName);
-                    Log.i(TAG,"Trying to connect to "+device.deviceAddress);
-                    connMngr.connectToDevice(device,null);
-                }
+            }
+            else{
+                WifiP2pDevice device= wifiDirectDeviceMap.get(deviceName);
+                Log.i(TAG,"Trying to connect to "+device.deviceAddress);
+                connMngr.connectToDevice(device,null);
+
+
+                //connMngr.connectToDeviceAsLegacy(device);
+                //ClientThread clientThread = new ClientThread(IPADDRESS, 7777);
+                //clientThread.start();
+
+
             }
         });
         return convertView;

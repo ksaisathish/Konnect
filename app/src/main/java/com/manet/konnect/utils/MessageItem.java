@@ -16,4 +16,12 @@ public  class MessageItem {
     public String getMessage() {
         return message;
     }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
+    }
 }

@@ -64,6 +64,9 @@ public class PermissionManager extends AppCompatActivity {
             permissionRequestCodes.put(Manifest.permission.BLUETOOTH_CONNECT,109);
             permissionRequestCodes.put(Manifest.permission.NEARBY_WIFI_DEVICES,110);
         }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            permissionRequestCodes.put(Manifest.permission.READ_EXTERNAL_STORAGE, 111);
+        }
 
         // Add more permissions and request codes as needed
     }
