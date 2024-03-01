@@ -1,8 +1,5 @@
 package com.manet.konnect.utils.debug;
 
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pInfo;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,7 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,9 +19,7 @@ import com.manet.konnect.core.NearbyConnectionsManager;
 import com.manet.konnect.utils.ConnectedNearbyConnectionsListAdapter;
 import com.manet.konnect.utils.DiscoveredNearbyConnectionsListAdapter;
 import com.manet.konnect.utils.OnNearbyConnectionDevicesDiscoveredListener;
-import com.manet.konnect.utils.WifiDirectDevicesListAdapter;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -105,7 +100,6 @@ public class NearbyConnectionsDebugSettingsFragment extends Fragment implements 
             else{
                 nearbyConnectionsManager.stopAdvertising();
                 startAdvertisingButton.setText("Start Nearby Connections \nAdvertising");
-
             }
         });
 
@@ -127,5 +121,15 @@ public class NearbyConnectionsDebugSettingsFragment extends Fragment implements 
         connectedDevicesListView.setAdapter(connectedNearbyConnectionsListAdapter);
     }
 
+    @Override
+    public void onDestroy() {
+        Log.i(TAG,"onDestroy Called!");
+        nearbyConnectionsManager.disconnectFromAllEndpoints();
+        nearbyConnectionsManager.stopAdvertising();
+        nearbyConnectionsManager.stopDiscovery();
+
+
+        super.onDestroy();
+    }
 
 }

@@ -3,6 +3,7 @@ package com.manet.konnect.utils;
 
 import com.manet.konnect.utils.debug.BluetoothDebugSettingsFragment;
 import com.manet.konnect.utils.debug.BluetoothLEDebugSettingsFragment;
+import com.manet.konnect.utils.debug.KonnectAPDebugFragment;
 import com.manet.konnect.utils.debug.NearbyConnectionsDebugSettingsFragment;
 import com.manet.konnect.utils.debug.NotificationDebugSettingsFragment;
 import com.manet.konnect.utils.debug.WifiDebugSettingsFragment;
@@ -21,6 +22,7 @@ public class DebugUtils {
         debugSettingsMap.put("Wi-Fi Direct Debug Settings", WifiDirectDebugSettingsFragment.class.getName());
         debugSettingsMap.put("Notifications Debug Settings", NotificationDebugSettingsFragment.class.getName());
         debugSettingsMap.put("Nearby Connections Debug Settings", NearbyConnectionsDebugSettingsFragment.class.getName());
+        debugSettingsMap.put("Konnect AP Debug Settings", KonnectAPDebugFragment.class.getName());
         // Add other debug settings and corresponding fragment class names
 
         // Add other debug settings

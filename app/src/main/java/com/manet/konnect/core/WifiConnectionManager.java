@@ -23,6 +23,7 @@ import com.thanosfisherman.wifiutils.WifiUtils;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
 import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WifiConnectionManager {
@@ -39,6 +40,19 @@ public class WifiConnectionManager {
     @SuppressLint("MissingPermission")
     public List<ScanResult> getAvailableNetworks() {
         return wifiManager.getScanResults();
+    }
+
+    @SuppressLint("MissingPermission")
+    public List<ScanResult> getKonnectNetworks() {
+        Log.i(TAG,"IN getKonnectNetworks()");
+        List<ScanResult> availableNetworks = new ArrayList<ScanResult>();
+        for (ScanResult result : wifiManager.getScanResults()) {
+            Log.i(TAG,"SSID : "+result.SSID);
+            if (result.SSID.startsWith("Konnect_")) {
+                availableNetworks.add(result);
+            }
+        }
+        return availableNetworks;
     }
 
     public void connectToWifi2(String ssid, String password) {

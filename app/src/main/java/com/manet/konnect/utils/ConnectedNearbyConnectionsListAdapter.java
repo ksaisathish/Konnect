@@ -11,6 +11,7 @@ import android.widget.Button;
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.manet.konnect.R;
 import com.manet.konnect.core.NearbyConnectionsManager;
+import com.manet.konnect.core.Packet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,13 +53,23 @@ public class ConnectedNearbyConnectionsListAdapter extends BaseAdapter {
         Button nearbyDeviceButton = convertView.findViewById(R.id.debugButton);
         final String endpointId = connectedDevices.get(position);
 
-        nearbyDeviceButton.setText(endpointId);
+        final String endPointName=nearbyConnectionsManager.getUsernameByEndpointId(endpointId);
+
+
+        nearbyDeviceButton.setText(endPointName+"("+endpointId+")");
 
         nearbyDeviceButton.setOnClickListener(v -> {
             if(endpointId=="No Nearby Devices Connected."){
             }
             else{
                 Log.i(TAG,"Trying to chat with "+endpointId);
+
+                String srcUsername= nearbyConnectionsManager.getLocalUserName();
+                String dstUsername=nearbyConnectionsManager.getUsernameByEndpointId(endpointId);
+
+                Packet textPacket=new Packet(srcUsername,dstUsername, 0, Packet.PACKET_TYPE_MESSAGE, Packet.DATA_TYPE_TEXT,"Hello!".getBytes());
+
+                nearbyConnectionsManager.sendPayload(endpointId,textPacket);
                 //nearbyConnectionsManager.initiateConnection(endpointId);
             }
         });

@@ -25,6 +25,9 @@ import com.google.android.gms.nearby.connection.Strategy;
 import com.manet.konnect.utils.OnNearbyConnectionDevicesDiscoveredListener;
 import com.manet.konnect.utils.OnWifiDirectDevicesDiscoveredListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,10 +48,16 @@ public class NearbyConnectionsManager {
     private OnNearbyConnectionDevicesDiscoveredListener listener;
     private final Map<String, String> endpointIdMap = new HashMap<>();
 
+    private final RoutingManager routingManager;
+    private final PayloadCallback payloadCallback;
+
+
 
 
     public NearbyConnectionsManager(Context context) {
         this.context = context;
+        routingManager=new RoutingManager(this);
+        payloadCallback = routingManager.getPayloadCallback();
     }
 
 
@@ -119,6 +128,10 @@ public class NearbyConnectionsManager {
                 @Override
                 public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
                     Log.i(TAG,"Connection Initiated!");
+
+                    Log.i(TAG,"Discovered Endpoint(Wanting to Connect) : "+endpointId+ " - " +connectionInfo.getEndpointInfo());
+                    endpointIdMap.put(connectionInfo.getEndpointName(), endpointId);
+                    Log.i(TAG,"SIZE : "+endpointIdMap.size());
                     // Handle connection initiation
                     Nearby.getConnectionsClient(context).acceptConnection(endpointId, payloadCallback);
                 }
@@ -130,7 +143,12 @@ public class NearbyConnectionsManager {
                     // Handle connection result
                     if (result.getStatus().isSuccess()) {
                         Log.i(TAG,"Connection Success!");
+
+
+
                         connectedDevices.add(endpointId);
+                        routingManager.addRoutingTableEntry(getUsernameByEndpointId(endpointId),endpointId);
+                        routingManager.updateNewNeighbouringNode(endpointId);
                         listener.onNearbyConnectionDevicesDevicesConnected(connectedDevices);
                     }
                     else{
@@ -142,9 +160,13 @@ public class NearbyConnectionsManager {
                 public void onDisconnected(String endpointId) {
                     // Handle disconnection
                     connectedDevices.remove(endpointId);
-                    listener.onNearbyConnectionDevicesDevicesConnected(connectedDevices);
+                    //updateRoutingTableEntry()
+                    //Add code to remove entries from routing table and to relay that info to others..
+                    Log.i(TAG,"Context : "+context);
+                    if(context!=null) {
+                        listener.onNearbyConnectionDevicesDevicesConnected(connectedDevices);
+                    }
                     Log.i(TAG,"Connection Disconnected!");
-
                 }
             };
 
@@ -171,34 +193,50 @@ public class NearbyConnectionsManager {
                 public void onEndpointLost(String endpointId) {
                     Log.i(TAG,"Discovered Endpoint Lost : "+endpointId);
                     // Handle endpoint loss
-                    discoveredEndpoints.removeIf(endpoint -> endpoint.getEndpointName().equals(endpointId));
+                    String endPointName = null;
                     for (Map.Entry<String, String> entry : endpointIdMap.entrySet()) {
                         if (entry.getValue().equals(endpointId)) {
+                            endPointName=entry.getKey();
                             endpointIdMap.remove(entry.getKey());
                             break;
                         }
                     }
+                    String finalEndPointName = endPointName;
+                    discoveredEndpoints.removeIf(endpoint -> endpoint.getEndpointName().equals(finalEndPointName));
+
 
                     listener.onNearbyConnectionDevicesDiscovered(discoveredEndpoints);
                 }
             };
 
+    public String getUsernameByEndpointId(String endpointId) {
+        for (Map.Entry<String, String> entry : endpointIdMap.entrySet()) {
+            if (entry.getValue().equals(endpointId)) {
+                return entry.getKey(); // Return the key (username/endpointName)
+            }
+        }
+        return null; // Return null if no match is found
+    }
 
-    private final PayloadCallback payloadCallback =
-            new PayloadCallback() {
-                @Override
-                public void onPayloadReceived(String endpointId, Payload payload) {
-                    Log.i(TAG,"onPayloadReceived!");
 
-                    // Handle received payload
-                }
 
-                @Override
-                public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
-                    Log.i(TAG,"onPayloadTransferUpdate!");
-                    // Handle payload transfer update
-                }
-            };
+    public void disconnectFromEndpoint(String endpointName) {
+        // Check if the endpointName exists in the map
+        if (endpointIdMap.containsKey(endpointName)) {
+            String endpointId = endpointIdMap.get(endpointName);
+            Nearby.getConnectionsClient(context).disconnectFromEndpoint(endpointId);
+            connectedDevices.remove(endpointId); // Remove from the connectedDevices list
+            endpointIdMap.remove(endpointName); // Remove from the map
+        }
+    }
+
+    public void disconnectFromAllEndpoints() {
+        for (String endpointId : connectedDevices) {
+            Nearby.getConnectionsClient(context).disconnectFromEndpoint(endpointId);
+        }
+        connectedDevices.clear(); // Clear the list after disconnecting from all endpoints
+        Log.i(TAG,"Disconnected form All Endpoints");
+    }
 
     public String getEndpointId(String endpointName) {
         return endpointIdMap.get(endpointName);
@@ -226,6 +264,26 @@ public class NearbyConnectionsManager {
                         });
 
 
+    }
+
+    public void sendPayload(String endpointId, Packet packet) {
+
+        if (Nearby.getConnectionsClient(context) != null) {
+            // Send the payload to the specified endpoint
+            Nearby.getConnectionsClient(context)
+                    .sendPayload(endpointId, Payload.fromBytes(packet.toByteArray()))
+                    .addOnSuccessListener(aVoid -> {
+                        // Payload sent successfully
+                        // Handle success if needed
+                    })
+                    .addOnFailureListener(e -> {
+                        // Payload sending failed
+                        // Handle failure if needed
+                        e.printStackTrace();
+                    });
+        }else{
+            Log.e(TAG,"Not able to Send Payload! Nearby Connections does not exist!!");
+        }
     }
 
     public void setNearbyConnectionDevicesDiscoveredListener(OnNearbyConnectionDevicesDiscoveredListener listener) {

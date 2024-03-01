@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.net.wifi.ScanResult;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +60,10 @@ public class WifiApsListAdapter extends BaseAdapter {
         wifiAPButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if(wifiAP.SSID.startsWith("Konnect_")){
+                    Log.i(TAG,"Trying to connect to "+wifiAP.SSID);
+                    connMngr.connectToWifi(wifiAP.SSID,"password");
+                }
             }
         });
 

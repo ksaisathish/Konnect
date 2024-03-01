@@ -4,49 +4,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".utils.debug.WifiDebugSettingsFragment">
-
+    tools:context=".utils.debug.KonnectAPDebugFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/wifiDebugHeading"
+            android:id="@+id/konnectAPDebugHeading"
             style="@style/HeadingText3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Wi-Fi Debug Settings"
+            android:text="Konnect AP Debug Settings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
 
         <TextView
-            android:id="@+id/wifiAPsHeading"
+            android:id="@+id/konnectAPsHeading"
             style="@style/MontserratSubHeadingGrey"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
-            android:text="Wi-Fi Access Points : "
+            android:text="Konnect Access Points :"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/wifiDebugHeading" />
+            app:layout_constraintTop_toBottomOf="@+id/konnectAPDebugHeading" />
 
         <ListView
-            android:id="@+id/wifiAPList"
+            android:id="@+id/konnectAPList"
             android:layout_width="0dp"
-            android:layout_height="400dp"
+            android:layout_height="300dp"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/wifiAPsHeading" />
+            app:layout_constraintTop_toBottomOf="@+id/konnectAPsHeading" />
 
         <Button
-            android:id="@+id/discoverWifiAPSDevices"
+            android:id="@+id/discoverKonnectAPSDevices"
             style="@style/SquaredOffButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,10 +54,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/wifiAPList" />
-
-
+            app:layout_constraintTop_toBottomOf="@+id/konnectAPList" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </FrameLayout>
