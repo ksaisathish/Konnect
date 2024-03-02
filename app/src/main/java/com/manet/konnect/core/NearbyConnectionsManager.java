@@ -42,15 +42,24 @@ public class NearbyConnectionsManager {
     private final String SERVICE_ID = "com.manet.konnect";
     private final Strategy STRATEGY = Strategy.P2P_CLUSTER;
 
+    public List<String> getConnectedDevices() {
+        return connectedDevices;
+    }
+
     private final List<String> connectedDevices = new ArrayList<>();
     private final List<DiscoveredEndpointInfo> discoveredEndpoints = new ArrayList<>();
 
-    private OnNearbyConnectionDevicesDiscoveredListener listener;
+    public OnNearbyConnectionDevicesDiscoveredListener listener;
+
+
     private final Map<String, String> endpointIdMap = new HashMap<>();
 
     private final RoutingManager routingManager;
     private final PayloadCallback payloadCallback;
 
+    public Map<String, String> getEndpointIdMap() {
+        return endpointIdMap;
+    }
 
 
 
@@ -128,10 +137,6 @@ public class NearbyConnectionsManager {
                 @Override
                 public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
                     Log.i(TAG,"Connection Initiated!");
-
-                    Log.i(TAG,"Discovered Endpoint(Wanting to Connect) : "+endpointId+ " - " +connectionInfo.getEndpointInfo());
-                    endpointIdMap.put(connectionInfo.getEndpointName(), endpointId);
-                    Log.i(TAG,"SIZE : "+endpointIdMap.size());
                     // Handle connection initiation
                     Nearby.getConnectionsClient(context).acceptConnection(endpointId, payloadCallback);
                 }
@@ -143,13 +148,14 @@ public class NearbyConnectionsManager {
                     // Handle connection result
                     if (result.getStatus().isSuccess()) {
                         Log.i(TAG,"Connection Success!");
-
-
-
                         connectedDevices.add(endpointId);
-                        routingManager.addRoutingTableEntry(getUsernameByEndpointId(endpointId),endpointId);
-                        routingManager.updateNewNeighbouringNode(endpointId);
-                        listener.onNearbyConnectionDevicesDevicesConnected(connectedDevices);
+
+                        routingManager.sendControlPacket(null,getLocalUserName(), ControlPacket.SHARE_USER_NAME, endpointId);
+                        if(getUsernameByEndpointId(endpointId)!=null) {
+                            routingManager.addRoutingTableEntry(getUsernameByEndpointId(endpointId), endpointId);
+                            routingManager.updateNewNeighbouringNode(endpointId);
+                            listener.onNearbyConnectionDevicesDevicesConnected(connectedDevices);
+                        }
                     }
                     else{
                         Log.i(TAG,"Connection Failure!");

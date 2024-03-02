@@ -34,6 +34,7 @@ public class RoutingTable {
     public void addRoutingEntry(RoutingTableEntry entry) {
         table.put(entry.getUsername(), entry);
         Log.i(TAG,"Added new Entry "+entry.getUsername()+" to the Routing Table!");
+        Log.i(TAG,"Table Size : "+table.size());
     }
     public void removeRoutingEntry(String username){
         table.remove(username);

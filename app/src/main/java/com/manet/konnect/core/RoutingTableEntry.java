@@ -1,6 +1,8 @@
 package com.manet.konnect.core;
 
-public class RoutingTableEntry {
+import java.io.Serializable;
+
+public class RoutingTableEntry implements Serializable  {
 
     private String username;
     private String endpointId;

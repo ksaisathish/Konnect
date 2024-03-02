@@ -8,15 +8,24 @@ import java.io.Serializable;
 public class ControlPacket implements Serializable {
 
     public static final int UPDATE_ROUTING_TABLE = 1;
+    public static final int SHARE_USER_NAME=2;
 
     private int controlType;
     private RoutingTableEntry updatedEntry;
 
+    public String getUserName() {
+        return userName;
+    }
+
+    private String userName;
+
     // Constructors, getters, setters...
 
-    public ControlPacket(int controlType, RoutingTableEntry updatedEntry) {
+    public ControlPacket(int controlType, RoutingTableEntry updatedEntry,String userName) {
         this.controlType = controlType;
         this.updatedEntry = updatedEntry;
+        this.userName=userName;
+
     }
 
     public int getControlType() {

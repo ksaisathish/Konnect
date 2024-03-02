@@ -85,6 +85,13 @@ public class RoutingManager {
             return;
         }
 
+        if(destinationUsername==null ||destinationUsername.equals("")){
+            if(receivedPacket.getPacketType()==Packet.PACKET_TYPE_CONTROL){
+                handleControlPacket(receivedPacket,sourceEndpointId);
+                return;
+            }
+        }
+
         // Check if the packet is meant for the current node
         if (destinationUsername.equals(nearbyConnectionsManager.getLocalUserName())) {
             int packetType = receivedPacket.getPacketType();
@@ -146,6 +153,19 @@ public class RoutingManager {
                 case ControlPacket.UPDATE_ROUTING_TABLE:
                     updateRoutingTable(controlPacket.getUpdatedEntry(),sourceEndpointId);
                     break;
+                case ControlPacket.SHARE_USER_NAME:
+                    Log.i(TAG,"Discovered Endpoint(One that Connect) : "+sourceEndpointId+ " - " +controlPacket.getUserName());
+                    nearbyConnectionsManager.getEndpointIdMap().put(controlPacket.getUserName(), sourceEndpointId);
+                    addRoutingTableEntry(controlPacket.getUserName(), sourceEndpointId);
+                    updateNewNeighbouringNode(sourceEndpointId);
+
+
+
+                    updateNeighbouringNodes(sourceEndpointId,getRoutingTable().getEntryByUsername(controlPacket.getUserName()));
+                    nearbyConnectionsManager.listener.onNearbyConnectionDevicesDevicesConnected(nearbyConnectionsManager.getConnectedDevices());
+                    Log.i(TAG,"End Point Map SIZE : "+nearbyConnectionsManager.getEndpointIdMap().size());
+                    Log.i(TAG,"RoutingTable SIZE : "+routingTable.getTable().size());
+                    break;
 
                 // Add more cases for other control packet types if needed
             }
@@ -156,18 +176,22 @@ public class RoutingManager {
     }
 
     private void updateRoutingTable(RoutingTableEntry updatedEntry,String sourceEndpointId) {
+        Log.i(TAG,"updateRoutingTable Called!");
         String updatedUsername = updatedEntry.getUsername();
+        Log.i(TAG,updatedUsername);
         if(updatedEntry.getDistance()==-1){
             //routingTable.getEntryByUsername(updatedUsername);
 
             routingTable.removeRoutingEntry(updatedUsername);
+            return;
             //updateNeighbouringNodes();
             //Should also relay this info to other nodes...Add the code here later..
             //Also missed some edge case, check on that too..
         }
         int updatedDistance = updatedEntry.getDistance() + 1; // Assuming the updated distance
 
-        if(updatedUsername== nearbyConnectionsManager.getLocalUserName()){
+        if(updatedUsername.equals(nearbyConnectionsManager.getLocalUserName())){
+            Log.i(TAG,"Entry has same username as self.");
             return;
         }
 
@@ -180,12 +204,14 @@ public class RoutingManager {
 
             // No prior entry with the given username, add a new entry
             routingTable.addRoutingEntry(updatedEntry);
+            updateNeighbouringNodes(sourceEndpointId,updatedEntry);
         } else {
             int existingDistance = existingEntry.getDistance();
 
             if (updatedDistance < existingDistance) {
                 existingEntry.setDistance(updatedDistance);
                 existingEntry.setNextHop(sourceEndpointId);
+                updateNeighbouringNodes(sourceEndpointId,existingEntry);
             }
             // Otherwise, do nothing since the existing path is already shorter
         }
@@ -214,21 +240,26 @@ public class RoutingManager {
         //To be called when a new connection is established
         // 1. Send control packets to the new node with all entries in its routing table(except the new node's)
         for (RoutingTableEntry entry : table.values()) {
+            Log.i(TAG,"Inside the Loop!");
             // Exclude the source endpoint ID to avoid flooding
             if (!entry.getEndpointId().equals(srcEndpointId)) {
-                sendControlPacket(entry, ControlPacket.UPDATE_ROUTING_TABLE, srcEndpointId);
+                Log.i(TAG,"Sharing "+entry.getEndpointId()+" To "+srcEndpointId);
+                sendControlPacket(entry,null, ControlPacket.UPDATE_ROUTING_TABLE, srcEndpointId);
             }
         }
     }
 
     public void updateNeighbouringNodes(String srcEndpointId,RoutingTableEntry updatedEntry) {
         Map<String, RoutingTableEntry> table = routingTable.getTable();
-
+        Log.i(TAG,"Update Neighbouring Nodes called! "+srcEndpointId+ " - "+updatedEntry.toString());
         for (RoutingTableEntry entry : table.values()) {
+            Log.i(TAG,"Inside loop!"+entry.getEndpointId());
             // Exclude the source endpoint ID to avoid flooding
             if (!entry.getEndpointId().equals(srcEndpointId)) {
+                Log.i(TAG,"Inside First IF Block");
                 if(entry.getEndpointId()==entry.getNextHop()) {
-                    sendControlPacket(entry, ControlPacket.UPDATE_ROUTING_TABLE, entry.getEndpointId());
+                    Log.i(TAG,"Inside Second IF Block");
+                    sendControlPacket(updatedEntry,null, ControlPacket.UPDATE_ROUTING_TABLE, entry.getEndpointId());
                 }
             }
         }
@@ -236,16 +267,25 @@ public class RoutingManager {
 
 
 
-    private void sendControlPacket(RoutingTableEntry entry, int controlType, String destinationEndpointId) {
+    public void sendControlPacket(RoutingTableEntry entry,String username, int controlType, String destinationEndpointId) {
         // Create a ControlPacket with the specified control type and routing table entry
-        ControlPacket controlPacket = new ControlPacket(controlType, entry);
+        ControlPacket controlPacket = new ControlPacket(controlType, entry,username);
 
         // Convert the ControlPacket to bytes
         byte[] controlPacketBytes = controlPacket.toByteArray();
 
+        Packet controlPacketPacket = null;
+        switch (controlType){
+            case ControlPacket.UPDATE_ROUTING_TABLE:
+                controlPacketPacket = new Packet(
+                        nearbyConnectionsManager.getLocalUserName(),nearbyConnectionsManager.getUsernameByEndpointId(destinationEndpointId),0, Packet.PACKET_TYPE_CONTROL,Packet.DATA_TYPE_CONTROL, controlPacketBytes);
+                break;
+            case ControlPacket.SHARE_USER_NAME:
+                controlPacketPacket = new Packet(
+                        nearbyConnectionsManager.getLocalUserName(), null,0, Packet.PACKET_TYPE_CONTROL,Packet.DATA_TYPE_CONTROL, controlPacketBytes);
+                break;
+        }
         // Create a Packet with the control packet bytes
-        Packet controlPacketPacket = new Packet(
-                nearbyConnectionsManager.getLocalUserName(), entry.getUsername(),0, Packet.PACKET_TYPE_CONTROL,Packet.DATA_TYPE_CONTROL, controlPacketBytes);
 
         // Send the control packet to the specified destination endpoint
         nearbyConnectionsManager.sendPayload(destinationEndpointId, controlPacketPacket);
