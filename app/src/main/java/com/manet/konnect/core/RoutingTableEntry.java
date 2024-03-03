@@ -1,13 +1,21 @@
 package com.manet.konnect.core;
 
+import android.util.Log;
+
+import com.manet.konnect.utils.MessageItem;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class RoutingTableEntry implements Serializable  {
+
 
     private String username;
     private String endpointId;
     private String nextHop;
     private int distance;
+
+    private transient ArrayList<MessageItem> messageList=new ArrayList<>();
 
 
     public RoutingTableEntry(String username, String endpointId, String nextHop, int distance) {
@@ -48,5 +56,17 @@ public class RoutingTableEntry implements Serializable  {
 
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    public ArrayList<MessageItem> getMessageList() {
+        return messageList;
+    }
+
+    public void setMessageList(ArrayList<MessageItem> messageList) {
+        this.messageList = messageList;
+    }
+    public void addMessageToList(MessageItem messageItem) {
+        this.messageList.add(messageItem);
+        Log.i("RoutingTableEntry","Added Message to List! Size : "+messageList.size());
     }
 }

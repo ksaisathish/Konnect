@@ -13,14 +13,18 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.manet.konnect.R;
 import com.manet.konnect.core.NearbyConnectionsManager;
+import com.manet.konnect.core.RoutingTableEntry;
+import com.manet.konnect.utils.AllConnectedNearbyDevicesListAdapter;
 import com.manet.konnect.utils.ConnectedNearbyConnectionsListAdapter;
 import com.manet.konnect.utils.DiscoveredNearbyConnectionsListAdapter;
 import com.manet.konnect.utils.OnNearbyConnectionDevicesDiscoveredListener;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,12 +35,13 @@ public class NearbyConnectionsDebugSettingsFragment extends Fragment implements 
 
     private String TAG="NearbyConnectionsDebugSettingsFragment";
     private TextView localUserName;
-    private ListView discoveredDevicesListView,connectedDevicesListView;
+    private ListView discoveredDevicesListView,connectedDevicesListView, allConnectedDevicesListView;
     private Button discoverDevicesButton,startAdvertisingButton;
 
     private NearbyConnectionsManager nearbyConnectionsManager;
     private ConnectedNearbyConnectionsListAdapter connectedNearbyConnectionsListAdapter;
     DiscoveredNearbyConnectionsListAdapter discoveredNearbyConnectionsListAdapter;
+    private AllConnectedNearbyDevicesListAdapter allConnectedNearbyDevicesListAdapter;
 
 
     public NearbyConnectionsDebugSettingsFragment() {
@@ -44,7 +49,7 @@ public class NearbyConnectionsDebugSettingsFragment extends Fragment implements 
     }
 
 
-    public static NearbyConnectionsDebugSettingsFragment newInstance(String param1, String param2) {
+    public static NearbyConnectionsDebugSettingsFragment newInstance() {
         NearbyConnectionsDebugSettingsFragment fragment = new NearbyConnectionsDebugSettingsFragment();
         return fragment;
     }
@@ -59,24 +64,24 @@ public class NearbyConnectionsDebugSettingsFragment extends Fragment implements 
                              Bundle savedInstanceState) {
 
         View rootView=inflater.inflate(R.layout.fragment_nearby_connections_debug_settings, container, false);
+        Log.i(TAG,"HERE4");
 
-        nearbyConnectionsManager = new NearbyConnectionsManager(requireContext());
+        NearbyConnectionsManager.initialize(requireContext());
+        Log.i(TAG,"HERE5");
+
+        nearbyConnectionsManager = NearbyConnectionsManager.getInstance();
+        Log.i(TAG,"HERE1");
+
         localUserName = rootView.findViewById(R.id.localUserName);
         discoveredDevicesListView = rootView.findViewById(R.id.nearbyConnectionsDiscoveredDevicesList);
         connectedDevicesListView = rootView.findViewById(R.id.nearbyConnectionsConnectedDevicesList);
+        allConnectedDevicesListView = rootView.findViewById(R.id.nearbyConnectionsNetworkDevicesList);
+
         discoverDevicesButton = rootView.findViewById(R.id.discoverNearbyConnectionsDevices);
         startAdvertisingButton = rootView.findViewById(R.id.startNearbyConnectionsAdvertising);
 
         discoverDevicesButton.setText("Discover Nearby \nConnection Devices");
         startAdvertisingButton.setText("Start Nearby Connections \nAdvertising");
-
-
-//        ArrayAdapter<String> discoveredDevicesAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
-//        discoveredDevicesListView.setAdapter(discoveredDevicesAdapter);
-//
-//        ArrayAdapter<String> connectedDevicesAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
-//        connectedDevicesListView.setAdapter(connectedDevicesAdapter);
-
 
         localUserName.setText("Local User Name: " + nearbyConnectionsManager.getLocalUserName());
         nearbyConnectionsManager.setNearbyConnectionDevicesDiscoveredListener(this);
@@ -119,6 +124,13 @@ public class NearbyConnectionsDebugSettingsFragment extends Fragment implements 
         Log.i(TAG,"onNearbyConnectionDevicesDevicesConnected");
         connectedNearbyConnectionsListAdapter=new ConnectedNearbyConnectionsListAdapter(requireContext(),connectedDevices,nearbyConnectionsManager);
         connectedDevicesListView.setAdapter(connectedNearbyConnectionsListAdapter);
+    }
+
+    @Override
+    public void onAllNearbyDevicesConnected(Map<String, RoutingTableEntry> table){
+        Log.i(TAG,"onAllNearbyDevicesConnected");
+        allConnectedNearbyDevicesListAdapter=new AllConnectedNearbyDevicesListAdapter(requireContext(),nearbyConnectionsManager,table);
+        allConnectedDevicesListView.setAdapter(allConnectedNearbyDevicesListAdapter);
     }
 
     @Override

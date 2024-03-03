@@ -27,18 +27,46 @@ import com.manet.konnect.utils.OnWifiDirectDevicesDiscoveredListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NearbyConnectionsManager {
+public class NearbyConnectionsManager{
+
+    private static NearbyConnectionsManager instance;
+
+    private NearbyConnectionsManager() {
+        // private constructor to enforce Singleton pattern
+    }
+
+    public static NearbyConnectionsManager getInstance() {
+        if (instance == null) {
+            Log.i(TAG,"HERE1");
+            throw new IllegalStateException("NearbyConnectionManager not initialized. Call intialize(Context) first.");
+        }
+        return instance;
+    }
+
+    public static void initialize(Context context) {
+    Log.i(TAG,"HERE2");
+        if (instance == null) {
+            Log.i(TAG,"HERE3");
+
+            instance = new NearbyConnectionsManager(context);
+            routingManager = RoutingManager.getInstance();
+            payloadCallback = routingManager.getPayloadCallback();
+            Log.i(TAG,"HERE7");
+        }
+    }
 
     private static final String TAG = "NearbyConnectionsManager";
+//    private final Context context;
 
-    private final Context context;
-
+    private Context context;
     private final String SERVICE_ID = "com.manet.konnect";
     private final Strategy STRATEGY = Strategy.P2P_CLUSTER;
 
@@ -54,8 +82,15 @@ public class NearbyConnectionsManager {
 
     private final Map<String, String> endpointIdMap = new HashMap<>();
 
-    private final RoutingManager routingManager;
-    private final PayloadCallback payloadCallback;
+    public RoutingManager getRoutingManager() {
+        return routingManager;
+    }
+
+    private static RoutingManager routingManager;
+    private static PayloadCallback payloadCallback;
+
+//    private final RoutingManager routingManager;
+//    private final PayloadCallback payloadCallback;
 
     public Map<String, String> getEndpointIdMap() {
         return endpointIdMap;
@@ -63,10 +98,8 @@ public class NearbyConnectionsManager {
 
 
 
-    public NearbyConnectionsManager(Context context) {
+    private NearbyConnectionsManager(Context context) {
         this.context = context;
-        routingManager=new RoutingManager(this);
-        payloadCallback = routingManager.getPayloadCallback();
     }
 
 

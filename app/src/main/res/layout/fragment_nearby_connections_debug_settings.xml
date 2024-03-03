@@ -30,7 +30,7 @@
             style="@style/MontserratSubHeadingGrey"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:text="Local User Name : "
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:text="Nearby Connections (Discovered) : "
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/localUserName" />
@@ -51,7 +51,7 @@
         <ListView
             android:id="@+id/nearbyConnectionsDiscoveredDevicesList"
             android:layout_width="0dp"
-            android:layout_height="200dp"
+            android:layout_height="100dp"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
@@ -94,20 +94,44 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
-            android:text="Nearby Connections - Connected (Chat): "
+            android:text="Nearby Connections -Directly Connected: "
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/startNearbyConnectionsAdvertising" />
 
         <ListView
             android:id="@+id/nearbyConnectionsConnectedDevicesList"
             android:layout_width="0dp"
-            android:layout_height="200dp"
+            android:layout_height="100dp"
             android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="32dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/nearbyConnectionsGroupDevicesHeading" />
+
+        <TextView
+            android:id="@+id/nearbyConnectionsNetworkDevicesHeading"
+            style="@style/MontserratSubHeadingGrey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:text="Nearby Connections - All Connected (Chat): "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nearbyConnectionsConnectedDevicesList" />
+
+        <ListView
+            android:id="@+id/nearbyConnectionsNetworkDevicesList"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nearbyConnectionsNetworkDevicesHeading" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

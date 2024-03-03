@@ -70,7 +70,6 @@ public class ConnectedNearbyConnectionsListAdapter extends BaseAdapter {
                 Packet textPacket=new Packet(srcUsername,dstUsername, 0, Packet.PACKET_TYPE_MESSAGE, Packet.DATA_TYPE_TEXT,"Hello!".getBytes());
 
                 nearbyConnectionsManager.sendPayload(endpointId,textPacket);
-                //nearbyConnectionsManager.initiateConnection(endpointId);
             }
         });
         return convertView;

@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.manet.konnect.utils.MessageItem;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,22 +17,24 @@ import java.util.Map;
 
 public class RoutingManager {
 
+    private static final RoutingManager instance = new RoutingManager();
 
+
+    private RoutingManager() {
+        // Private constructor to enforce singleton pattern
+        this.routingTable = RoutingTable.getInstance();
+        initPayloadCallback();
+    }
+
+    public static RoutingManager getInstance() {
+        return instance;
+    }
     private static final String TAG = "RoutingManager";
 
     private final RoutingTable routingTable;
 
     private PayloadCallback payloadCallback;
-    private NearbyConnectionsManager nearbyConnectionsManager;
-
-    public RoutingManager(NearbyConnectionsManager nearbyConnectionsManager) {
-        // Private constructor to enforce singleton pattern
-        initPayloadCallback();
-        this.routingTable = RoutingTable.getInstance();
-        this.nearbyConnectionsManager=nearbyConnectionsManager;
-    }
-
-
+    private NearbyConnectionsManager nearbyConnectionsManager=NearbyConnectionsManager.getInstance();
 
     // Initialize PayloadCallback
     private void initPayloadCallback() {
@@ -136,6 +139,9 @@ public class RoutingManager {
     private void handleTextData(Packet receivedPacket, String sourceEndpointId) {
         String senderUsername = receivedPacket.getSrcUsername();
         String textMessage = new String(receivedPacket.getBody());
+        RoutingTableEntry entry= nearbyConnectionsManager.getRoutingManager().getRoutingTable().getEntryByUsername(senderUsername);
+        MessageItem messageItem=new MessageItem(senderUsername,textMessage);
+        entry.addMessageToList(messageItem);
         Log.i(TAG, "Received Text Message from " + senderUsername + ": " + textMessage +" through endpoint "+sourceEndpointId);
 
         // You can add more handling logic here based on your requirements
@@ -152,6 +158,7 @@ public class RoutingManager {
             switch (controlPacket.getControlType()) {
                 case ControlPacket.UPDATE_ROUTING_TABLE:
                     updateRoutingTable(controlPacket.getUpdatedEntry(),sourceEndpointId);
+                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected(routingTable.getTable());
                     break;
                 case ControlPacket.SHARE_USER_NAME:
                     Log.i(TAG,"Discovered Endpoint(One that Connect) : "+sourceEndpointId+ " - " +controlPacket.getUserName());
@@ -159,10 +166,10 @@ public class RoutingManager {
                     addRoutingTableEntry(controlPacket.getUserName(), sourceEndpointId);
                     updateNewNeighbouringNode(sourceEndpointId);
 
-
-
+//                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected(routingTable.getTable());
                     updateNeighbouringNodes(sourceEndpointId,getRoutingTable().getEntryByUsername(controlPacket.getUserName()));
                     nearbyConnectionsManager.listener.onNearbyConnectionDevicesDevicesConnected(nearbyConnectionsManager.getConnectedDevices());
+                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected(routingTable.getTable());
                     Log.i(TAG,"End Point Map SIZE : "+nearbyConnectionsManager.getEndpointIdMap().size());
                     Log.i(TAG,"RoutingTable SIZE : "+routingTable.getTable().size());
                     break;

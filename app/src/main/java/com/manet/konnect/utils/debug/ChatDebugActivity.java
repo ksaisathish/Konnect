@@ -61,6 +61,7 @@ public class ChatDebugActivity extends AppCompatActivity implements ChatInterfac
 
         // Initialize the message list and adapter
         messageList = new ArrayList<>();
+
         messageAdapter = new MessageDebugAdapter(this, messageList);
         messagesListView.setAdapter(messageAdapter);
 
