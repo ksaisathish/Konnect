@@ -127,9 +127,10 @@ public class NearbyConnectionsDebugSettingsFragment extends Fragment implements 
     }
 
     @Override
-    public void onAllNearbyDevicesConnected(Map<String, RoutingTableEntry> table){
+    public void onAllNearbyDevicesConnected(){
         Log.i(TAG,"onAllNearbyDevicesConnected");
-        allConnectedNearbyDevicesListAdapter=new AllConnectedNearbyDevicesListAdapter(requireContext(),nearbyConnectionsManager,table);
+        allConnectedNearbyDevicesListAdapter=new AllConnectedNearbyDevicesListAdapter(requireContext(),nearbyConnectionsManager);
+
         allConnectedDevicesListView.setAdapter(allConnectedNearbyDevicesListAdapter);
     }
 

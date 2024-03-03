@@ -3,6 +3,7 @@ package com.manet.konnect.utils.debug;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,7 +21,7 @@ import com.manet.konnect.utils.MessageItem;
 
 import java.util.ArrayList;
 
-public class NearbyChatDebugActivity extends AppCompatActivity implements ChatInterface {
+public class NearbyChatDebugActivity extends AppCompatActivity{
 
     private TextView chatUserName;
     private ListView messagesListView;
@@ -33,6 +34,7 @@ public class NearbyChatDebugActivity extends AppCompatActivity implements ChatIn
     String username;
 
     private final String  TAG="NearbyChatDebugActivity";
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +54,24 @@ public class NearbyChatDebugActivity extends AppCompatActivity implements ChatIn
         // Initialize the message list and adapter
         //messageList = new ArrayList<>();
         messageList=nearbyConnectionsManager.getRoutingManager().getRoutingTable().getEntryByUsername(username).getMessageList();
+
+        if(nearbyConnectionsManager.getRoutingManager().getRoutingTable().getEntryByUsername(username)==null){
+            Log.i(TAG,"IS null");
+        }
+        Log.i(TAG,"HERE!");
+        if(messageList==null){
+            Log.i(TAG,"List is Null");
+            messageList=new ArrayList<>();
+        }
+        else{
+            Log.i(TAG,"List is Not Null");
+        }
         messageAdapter = new MessageDebugAdapter(this, messageList);
         messagesListView.setAdapter(messageAdapter);
 
         sendButton.setOnClickListener(v -> sendMessage());
+
+        mHandler.postDelayed(mRunnable, 500);
     }
 
     // Method to send a message
@@ -80,22 +96,26 @@ public class NearbyChatDebugActivity extends AppCompatActivity implements ChatIn
     }
 
 
-    //This is not used for this case, as of yet.
-    @Override
-    public void loadReceivedMessage(MessageItem messageItem) {
-        runOnUiThread(() -> {
-            messageItem.setPersonName(username);
-            messageList.add(messageItem);
-            messageAdapter = new MessageDebugAdapter(this, messageList);
-//            messageAdapter.addMessage(messageItem);
+
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            messageAdapter.updateData();
             messagesListView.setAdapter(messageAdapter);
-            //Toast.makeText(this, "Received message: " + messageItem.getMessage(), Toast.LENGTH_SHORT).show();
-        });
-    }
+            nearbyConnectionsManager.getRoutingManager().getRoutingTable().getEntryByUsername(username).clearUnreadMessageCount();
+            nearbyConnectionsManager.listener.onAllNearbyDevicesConnected();
+//            Log.i(TAG,"MessageList updated..");
+            mHandler.postDelayed(this, 200);
+        }
+    };
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
+
     }
 }

@@ -18,6 +18,10 @@ public class RoutingTableEntry implements Serializable  {
     private transient ArrayList<MessageItem> messageList=new ArrayList<>();
 
 
+
+    private transient int unreadMessageCount=0;
+
+
     public RoutingTableEntry(String username, String endpointId, String nextHop, int distance) {
         this.username = username;
         this.endpointId = endpointId;
@@ -59,6 +63,9 @@ public class RoutingTableEntry implements Serializable  {
     }
 
     public ArrayList<MessageItem> getMessageList() {
+        if(messageList==null){
+            messageList=new ArrayList<>();
+        }
         return messageList;
     }
 
@@ -66,7 +73,25 @@ public class RoutingTableEntry implements Serializable  {
         this.messageList = messageList;
     }
     public void addMessageToList(MessageItem messageItem) {
+        if(messageList==null){
+            messageList=new ArrayList<>();
+        }
         this.messageList.add(messageItem);
         Log.i("RoutingTableEntry","Added Message to List! Size : "+messageList.size());
+    }
+
+    public int getUnreadMessageCount() {
+        return unreadMessageCount;
+    }
+
+    public void setUnreadMessageCount(int unreadMessageCount) {
+        this.unreadMessageCount = unreadMessageCount;
+    }
+
+    public void incrementUnreadMessageCount(){
+        unreadMessageCount++;
+    }
+    public void clearUnreadMessageCount(){
+        unreadMessageCount=0;
     }
 }

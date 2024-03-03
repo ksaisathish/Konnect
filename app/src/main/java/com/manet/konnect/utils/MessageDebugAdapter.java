@@ -45,8 +45,8 @@ public class MessageDebugAdapter extends ArrayAdapter<MessageItem> {
 
         // Set the data to the views
         if (currentItem != null) {
-            Log.i(TAG,currentItem.getMessage());
-            Log.i(TAG,currentItem.getPersonName());
+            //Log.i(TAG,currentItem.getMessage());
+            //Log.i(TAG,currentItem.getPersonName());
             personNameTextView.setText(currentItem.getPersonName());
             messageTextView.setText(currentItem.getMessage());
         }
@@ -57,6 +57,10 @@ public class MessageDebugAdapter extends ArrayAdapter<MessageItem> {
     // Method to add a new message to the list
     public void addMessage(MessageItem messageItem) {
         messageList.add(messageItem);
+        notifyDataSetChanged();
+    }
+
+    public void updateData(){
         notifyDataSetChanged();
     }
 }

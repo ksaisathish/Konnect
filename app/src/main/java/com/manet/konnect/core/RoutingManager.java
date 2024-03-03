@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.manet.konnect.utils.ChatInterface;
 import com.manet.konnect.utils.MessageItem;
 
 import java.io.ByteArrayInputStream;
@@ -142,7 +143,14 @@ public class RoutingManager {
         RoutingTableEntry entry= nearbyConnectionsManager.getRoutingManager().getRoutingTable().getEntryByUsername(senderUsername);
         MessageItem messageItem=new MessageItem(senderUsername,textMessage);
         entry.addMessageToList(messageItem);
+        entry.incrementUnreadMessageCount();
+        nearbyConnectionsManager.listener.onAllNearbyDevicesConnected();
+
+        Log.i(TAG,"Unread Message Count : "+entry.getUnreadMessageCount());
         Log.i(TAG, "Received Text Message from " + senderUsername + ": " + textMessage +" through endpoint "+sourceEndpointId);
+        MyNotificationManager notificationManager = new MyNotificationManager(nearbyConnectionsManager.getContext());
+        notificationManager.showNewMessageNotification(senderUsername, textMessage);
+
 
         // You can add more handling logic here based on your requirements
     }
@@ -158,7 +166,7 @@ public class RoutingManager {
             switch (controlPacket.getControlType()) {
                 case ControlPacket.UPDATE_ROUTING_TABLE:
                     updateRoutingTable(controlPacket.getUpdatedEntry(),sourceEndpointId);
-                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected(routingTable.getTable());
+                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected();
                     break;
                 case ControlPacket.SHARE_USER_NAME:
                     Log.i(TAG,"Discovered Endpoint(One that Connect) : "+sourceEndpointId+ " - " +controlPacket.getUserName());
@@ -169,7 +177,7 @@ public class RoutingManager {
 //                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected(routingTable.getTable());
                     updateNeighbouringNodes(sourceEndpointId,getRoutingTable().getEntryByUsername(controlPacket.getUserName()));
                     nearbyConnectionsManager.listener.onNearbyConnectionDevicesDevicesConnected(nearbyConnectionsManager.getConnectedDevices());
-                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected(routingTable.getTable());
+                    nearbyConnectionsManager.listener.onAllNearbyDevicesConnected();
                     Log.i(TAG,"End Point Map SIZE : "+nearbyConnectionsManager.getEndpointIdMap().size());
                     Log.i(TAG,"RoutingTable SIZE : "+routingTable.getTable().size());
                     break;

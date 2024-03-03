@@ -15,5 +15,7 @@ public interface OnNearbyConnectionDevicesDiscoveredListener {
 
     void onNearbyConnectionDevicesDevicesConnected(List<String> connectedDevices);
 
-    void onAllNearbyDevicesConnected(Map<String, RoutingTableEntry> table);
+    void onAllNearbyDevicesConnected();
+
+
 }

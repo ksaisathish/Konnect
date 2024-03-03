@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.manet.konnect.R;
 import com.manet.konnect.core.NearbyConnectionsManager;
@@ -26,10 +27,10 @@ public class AllConnectedNearbyDevicesListAdapter extends BaseAdapter {
 
     private final String TAG = "AllConnectedNearbyDevicesListAdapter";
 
-    public AllConnectedNearbyDevicesListAdapter(Context context, NearbyConnectionsManager nearbyConnectionsManager, Map<String, RoutingTableEntry> table) {
+    public AllConnectedNearbyDevicesListAdapter(Context context, NearbyConnectionsManager nearbyConnectionsManager) {
         this.context = context;
         this.nearbyConnectionsManager = nearbyConnectionsManager;
-        this.table = table;
+        this.table = nearbyConnectionsManager.getRoutingManager().getRoutingTable().getTable();
     }
 
     @Override
@@ -58,6 +59,7 @@ public class AllConnectedNearbyDevicesListAdapter extends BaseAdapter {
         }
 
         Button nearbyDeviceButton = convertView.findViewById(R.id.debugButton);
+        TextView unreadMessageCount = convertView.findViewById(R.id.unreadMessageCount);
 
         // Convert Map values to a List for indexing
         List<RoutingTableEntry> entries = new ArrayList<>(table.values());
@@ -66,6 +68,19 @@ public class AllConnectedNearbyDevicesListAdapter extends BaseAdapter {
         final String endpointId = entry.getEndpointId();
 
         nearbyDeviceButton.setText(entry.getUsername() + "(" + endpointId + ")");
+
+        if(entry.getUnreadMessageCount()==1){
+            unreadMessageCount.setText(entry.getUnreadMessageCount()+" Unread Message");
+            unreadMessageCount.setVisibility(View.VISIBLE);
+        }
+        else if(entry.getUnreadMessageCount()>1){
+            unreadMessageCount.setText(entry.getUnreadMessageCount()+" Unread Messages");
+            unreadMessageCount.setVisibility(View.VISIBLE);
+        }
+        else{
+            unreadMessageCount.setText("");
+            unreadMessageCount.setVisibility(View.GONE);
+        }
 
         nearbyDeviceButton.setOnClickListener(v -> {
             if (endpointId.equals("No Nearby Devices Connected.")) {
@@ -83,11 +98,7 @@ public class AllConnectedNearbyDevicesListAdapter extends BaseAdapter {
     }
 
     // Function to update the table with current routing table entries
-    public void updateTable(Map<String, RoutingTableEntry> newTable) {
-        // Update the table with the new values
-        table = newTable;
-
-        // Notify the adapter that the data set has changed
+    public void refreshList() {
         notifyDataSetChanged();
     }
 }

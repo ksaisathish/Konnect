@@ -66,6 +66,10 @@ public class NearbyConnectionsManager{
     private static final String TAG = "NearbyConnectionsManager";
 //    private final Context context;
 
+    public Context getContext() {
+        return context;
+    }
+
     private Context context;
     private final String SERVICE_ID = "com.manet.konnect";
     private final Strategy STRATEGY = Strategy.P2P_CLUSTER;
